@@ -1,0 +1,40 @@
+doctype html
+html
+	head
+		include head.jade
+	body
+		#wrap
+			include header.jade
+			#contents
+				.wrap
+					#mainVisual
+							ul#slide
+								li
+									img(src="../images/mainVisual_1.jpg", title="mainVisual_1", alt="mainVisual_1")
+								li
+									img(src="../images/mainVisual_2.jpg", title="mainVisual_2", alt="mainVisual_2")
+								li
+									img(src="../images/mainVisual_3.jpg", title="mainVisual_3", alt="mainVisual_3")
+					.content
+						#main
+							ul.youtubePlayList
+								li
+									<iframe class="mainYoutubeVideo" src="https://www.youtube.com/embed/Zb0YWhjpIwU" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+								li
+									<iframe class="mainYoutubeVideo" src="https://www.youtube.com/embed/K2AcTUptNVg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+					script.
+						$(() => {
+							$("#slide").slick({
+								dots : true,
+								infinite : true,
+								speed : 300,
+								autoplay : true,
+								autoplaySpeed : 3000,
+								slidesToShow : 1,
+								slidesToScroll : 1,
+								arrows : true
+							});
+						});
+
+			include footer.jade
+		include script.jade

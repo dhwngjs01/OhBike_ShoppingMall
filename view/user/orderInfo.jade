@@ -1,0 +1,50 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#orderInfo
+						.title
+							i.fas.fa-tasks
+							h2 주문 조회
+
+						table#orderInfoList
+							colgroup
+								col(style="width:15%")
+								col(style="width:20%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+							thead
+								tr
+									th(colspan="2") 상품
+									th 사이즈
+									th 수량
+									th 가격
+									th 배송상태
+									th 주문일자
+							tbody
+								- if(orderInfoListCount > 0){
+									each order, i in orderList
+										tr
+											td
+												img(src="../uploadFiles/#{order.file_save_name}" style="width:100%;")
+											td #{order.product_name}
+											td #{order.option_name}
+											td #{order.option_num}
+											td #{order.order_totalPrice.numberWithCommas()}
+											td #{order.order_status}
+											td #{order.order_date.format("yyyy-MM-dd")}
+								- } else {
+									tr
+										td(colspan="8") 주문한 상품이 없습니다.
+								- }
+
+			include ../footer.jade
+		include ../script.jade

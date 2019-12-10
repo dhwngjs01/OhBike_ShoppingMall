@@ -1,0 +1,186 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#join
+						.joinBox
+							h3.title 회원가입
+							.joinBoxArea
+								form#joinForm(action="/user/join" method="post" name="joinForm")
+									.form-group
+										input(type="text" name="userId" id="userId" data-required="true")
+										label(for="userId") 아이디
+										.valid-feedback 아이디 항목을 입력해주세요.
+									.form-group
+										input(type="password" name="userPw" id="userPw" data-required="true")
+										label(for="userPw") 비밀번호
+										.valid-feedback 비밀번호 항목을 입력해주세요.
+										.invalidPw 비밀번호 항목과 비밀번호 확인 항목을 같게 입력해주세요.
+									.form-group
+										input(type="password" name="userPw2" id="userPw2" data-required="true")
+										label(for="userPw2") 비밀번호 확인
+										.valid-feedback 비밀번호 확인 항목을 입력해주세요.
+										.invalidPw 비밀번호 항목과 비밀번호 확인 항목을 같게 입력해주세요.
+									.form-group
+										input(type="text" name="userName" id="userName" data-required="true")
+										label(for="userName") 이름
+										.valid-feedback 이름 항목을 입력해주세요.
+									.form-group
+										input(type="text" name="userPhone" id="userPhone" data-required="true")
+										label(for="userPhone") 휴대폰 번호
+										.valid-feedback 휴대폰 번호 항목을 입력해주세요.
+										.invalidPhone 010-1234-1234 형식으로 입력해주세요.
+									.form-group#address
+										.zipCode
+											input(type="text" name="userZipCode" id="userZipCode" readonly data-required="true")
+											label(for="userZipCode") 우편번호
+											.valid-feedback 우편번호를 입력해주세요.
+										.btnFindAddress
+											button#btnFindAddress(type="button") 주소찾기
+										ul.address
+											li
+												input(type="text" name="userAddress" id="userAddress" readonly data-required="true")
+												label(for="userAddress") 주소
+												.valid-feedback 주소를 입력해주세요.
+											li
+												input(type="text" name="userDetailAddress" id="userDetailAddress" readonly)
+												label(for="userDetailAddress") 상세 주소
+												
+										
+									p.joinBtn
+										button(type="submit" id="joinBtn") 회원가입
+			include ../footer.jade
+		include ../script.jade
+		script(src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js")
+		script.
+			$(() => {
+				inputFocusEffect();
+			});
+
+			$("#userId").keyup(function(){
+				var userId = $(this).val();
+
+				if($.trim(userId) != ""){
+					$.ajax({
+						type : "POST",
+						url : "/user/join/overlapUserId",
+						data : { userId : userId },
+						success : function(res){
+							if(res){
+								$(".overlapUserId").remove();
+								$("#userId").siblings(".valid-feedback").css({ "visibility" : "hidden" }).hide();
+								$("#userId").after('<div class="overlapUserId" style="display:block;">이미 등록된 아이디입니다. 다른 아이디를 사용해주세요.</div>');
+							} else {
+								$(".overlapUserId").remove();
+								$("#userId").siblings(".valid-feedback").css({ "visibility" : "hidden" }).show();
+							}
+						},
+						error : function(e){
+							console.log(e);
+						}
+					});
+				} else {
+					$("#userId").siblings(".valid-feedback").css({ "visibility" : "visible" }).show();
+					$(".overlapUserId").remove();
+				}
+			});
+
+			$("input[type=password]").keyup(function(){
+				var userPw = $("#userPw").val();
+				var userPw2 = $("#userPw2").val();
+
+				if(userPw == "" && userPw2 == ""){
+					$(".invalidPw").hide();
+					$("#userPw, #userPw2").siblings(".valid-feedback").css({ "visibility" : "visible" }).show();
+				}
+
+				if((userPw != "" && userPw2 == "") || (userPw == "" && userPw2 != "")){
+					$(".invalidPw").show();
+					$("#userPw, #userPw2").siblings(".valid-feedback").css({ "visibility" : "visible" }).hide();
+				}
+				
+				if(userPw != "" && userPw2 != ""){
+					if(userPw == userPw2){
+						$(".invalidPw").hide();
+						$("#userPw, #userPw2").siblings(".valid-feedback").css({ "visibility" : "hidden" }).show();
+					} else {
+						$(".invalidPw").show();
+						$("#userPw, #userPw2").siblings(".valid-feedback").css({ "visibility" : "hidden" }).hide();
+					}
+				}
+			});
+
+			$("#userPhone").keyup(function(){
+				var userPhone = $(this).val();
+				var phoneFormat = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
+
+				if(userPhone != ""){
+					if(!phoneFormat.test(userPhone)){
+						$(".invalidPhone").show();
+						$(this).siblings(".valid-feedback").css({ "visibility" : "hidden" }).hide();
+					} else {
+						$(".invalidPhone").hide();
+						$(this).siblings(".valid-feedback").css({ "visibility" : "hidden" }).show();
+					}
+				} else {
+					$(".invalidPhone").hide();
+					$(this).siblings(".valid-feedback").css({ "visibility" : "visible" }).show();
+				}
+			});
+
+			$("#joinForm").submit(function(){
+				if(!validFeedback($(this)))
+					return false;
+
+				if($("#userPw").val() != $("#userPw2").val())
+					return false;
+				
+				var phoneFormat = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
+				if(!phoneFormat.test($("#userPhone").val()))
+					return false;
+
+				$.ajax({
+					type : "POST",
+					url : "/user/join",
+					data : $(this).serialize(),
+					success : (res) => {
+						if(res.sqlError){
+							alert("알 수 없는 오류가 발생했습니다.\n새로고침 후 이용해주세요.");
+							return false;
+						}
+
+						alert("회원가입이 완료되었습니다.");
+						link("/user/login");
+					},
+					error : (e) => {
+						console.log(e);
+					}
+				});
+
+				return false;
+			});
+			
+			$("#btnFindAddress").click(function(){
+				new daum.Postcode({
+					oncomplete: function(data) {
+						// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+						// 예제를 참고하여 다양한 활용법을 확인해 보세요.
+
+						$("#userZipCode").val(data.zonecode);
+						$("#userAddress").val(data.roadAddress);
+						$("#userDetailAddress").val(data.buildingName);
+						
+						$("#userZipCode").siblings("label").addClass("active");
+						$("#userAddress").siblings("label").addClass("active");
+						$("#userDetailAddress").siblings("label").addClass("active");
+
+						
+						$("#userDetailAddress").prop("readonly", false);
+					}
+				}).open();
+			});

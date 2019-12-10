@@ -1,0 +1,61 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#myPage
+						.left
+							h3.title 마이페이지
+							
+							p.user_name #{session.user_name} 님
+							
+							.sideMenu
+								.sideMenuItem
+									p 쇼핑정보
+									ul
+										li
+											a(href="/user/orderInfo") - 주문/배송조회
+										li
+											a(href="/user/basket") - 장바구니
+								.sideMenuItem
+									p 회원정보
+									ul
+										li
+											a(href="/user/modify") - 회원정보수정
+										li
+											a(href="/user/dieMySelf") - 회원탈퇴
+
+						.right
+							ul.linkBox
+								li
+									a(href="/user/orderInfo")
+										.image
+											<i class="fas fa-map-marked-alt"></i>
+										p 주문배송조회
+								li
+									a(href="/user/basket")
+										.image
+											<i class="fas fa-shopping-basket"></i>
+										p 장바구니
+								li
+									a(href="/user/modify")
+										.image
+											<i class="far fa-user-circle"></i>
+										p 개인정보수정
+								li
+									a(href="/user/modify")
+										.image
+											<i class="fas fa-unlock-alt"></i>
+										p 비밀번호변경
+								li
+									a(href="/user/dieMySelf")
+										.image
+											<i class="fas fa-user-slash"></i>
+										p 회원탈퇴
+
+			include ../footer.jade
+		include ../script.jade

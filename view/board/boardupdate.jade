@@ -1,0 +1,35 @@
+include ../main.jade
+	link(rel='stylesheet',href='../css/board.css')
+	title 수정페이지
+	.frame
+		.write_div
+			input#title(type="text" placeholder="제목" value=board.board_title)
+			textarea#content(cols="30", rows="10")=board.board_content
+		.write_btn_div
+			button#write_btn 수정
+			button#write_close 취소
+	script.
+		$("#write_btn").click(()=>{
+			no=#{board.board_no}
+			title=$("#title").val()
+			content=$("#content").val()
+			$.ajax({
+				url:'/board/update',
+				dataType:'json',
+				type:'post',
+				data:{no:no,title:title,content:content},
+				success:(result)=>{
+					if(result){
+						alert("글 수정 완료!")
+						location.href="/board/read?no="+no
+					}else{
+						alert("글 수정 실패")
+						$("#title").val("")
+						$("#content").val("")
+					}
+				}
+			})
+		})
+		$("#write_close").click(()=>{
+			location.href="/"
+		})

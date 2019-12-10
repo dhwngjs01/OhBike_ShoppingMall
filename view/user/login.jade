@@ -1,0 +1,57 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#login
+						.loginBox
+							h3.title 로그인
+							.loginBoxArea
+								form#loginForm(action="/user/login" method="post")
+									.form-group
+										input(type="text" name="userId" id="userId")
+										label(for="userId") 아이디
+									.form-group
+										input(type="password" name="userPw" id="userPw")
+										label(for="userPw") 비밀번호
+									p.loginBtn
+										button(type="submit" id="loginBtn") 로그인
+									p.joinComment 아직 회원이 아니신가요?
+									p.joinBtn
+										a(href="/user/join") 회원가입
+			include ../footer.jade
+		include ../script.jade
+								
+
+
+
+	script.
+		$(() => {
+			inputFocusEffect();
+		});
+
+		$("#loginForm").submit(function(){
+			$.ajax({
+				type : "POST",
+				url : "/user/login",
+				data : $(this).serialize(),
+				success : (res) => {
+					if(res.loginFailed){
+						alert("아이디와 비밀번호를 다시 확인해주세요.");
+						return false;
+					}
+
+					alert(res.user_name + "님 환영합니다.");
+					link("/");
+				},
+				error : (e) => {
+					console.log(e);
+				}
+			});
+
+			return false;
+		});

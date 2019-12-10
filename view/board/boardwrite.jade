@@ -1,0 +1,34 @@
+include ../main.jade
+	link(rel='stylesheet',href='../css/board.css')
+	title 쓰기페이지
+	.frame
+		.write_div
+			input#title(type="text" placeholder="제목")
+			textarea#content(cols="30", rows="10")
+		.write_btn_div
+			button#write_btn 글쓰기
+			button#write_close 취소
+	script.
+		$("#write_btn").click(()=>{
+			title=$("#title").val()
+			content=$("#content").val()
+			$.ajax({
+				url:'/board/write',
+				dataType:'json',
+				type:'post',
+				data:{title:title,content:content},
+				success:(result)=>{
+					if(result.flag){
+						alert("글 작성 완료!")
+						location.href="/board/read?no="+result.insertId
+					}else{
+						alert("글 수정 실패")
+						$("#title").val("")
+						$("#content").val("")
+					}
+				}
+			})
+		})
+		$("#write_close").click(()=>{
+			location.href="/"
+		})

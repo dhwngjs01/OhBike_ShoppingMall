@@ -1,0 +1,40 @@
+header#header
+	#headerTop
+		.wrap
+			ul#util
+				if(!session.user_no)
+					li
+						a(href="/user/login") 로그인
+					li
+						a(href="/user/join") 회원가입
+				else
+					li
+						a(href="/user/logout") 로그아웃
+					li
+						a(href="/user/basket") 장바구니
+					li
+						a(href="/user/mypage") 마이페이지
+	#headerMain
+		.wrap
+			h1#logo
+				a(href="/" title="HOME")
+					img(src="../images/logo.png", alt="Oh! 바이크" title="Oh! 바이크")
+			#search
+				form(action="/", method="get", onsubmit="return false;")
+					input(type="text", name="searchKey")
+					button(type="submit")
+						i(class="fas fa-search")
+	#headerBottom
+		.wrap
+			nav#menu
+				ul.menu
+					li
+						a(href="/public/helmet") 헬멧
+					li
+						a(href="/public/ridingWear") 라이딩웨어
+					li
+						a(href="/public/gloves") 장갑
+					li
+						a(href="/public/boots") 부츠
+					li
+						a(href="/public/protection") 보호구

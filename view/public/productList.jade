@@ -1,0 +1,82 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#productList
+						#brandList
+							.left
+								.title 브랜드
+							.right
+								ul.brandList
+									each brand, i in brandList
+										li
+											label(for="brand_#{i}") #{brand.product_brand}
+											input(type="checkbox" id="brand_#{i}" name="brand" value="#{brand.product_brand}")
+
+				#getProductList
+
+			include ../footer.jade
+		include ../script.jade
+
+		script.
+			let checkedBox = false;
+			
+			$(() => {
+				// 뒤로가기 버그 방지
+				$("input[type=checkbox]:checked").prop("checked", false);
+
+				getProductList();
+
+				$("input[type=checkbox]").change(function(){
+					let checked = $(this).prop("checked");
+
+					if(checked){
+						$(this).siblings("label").addClass("active");
+						checkedBox = true;
+					} else {
+						$(this).siblings("label").removeClass("active");
+						checkedBox = false;
+					}
+
+					getProductList();
+				});
+			});
+			
+			var getProductList = () => {
+				let brand = new Array();
+
+				$("input[type=checkbox]:checked").each((i, input) => {
+					brand.push($(input).val());
+				});
+
+				brand = JSON.stringify(brand);
+
+				$.ajax({
+					type : "POST",
+					url : "/public/getProductList",
+					data : { category : "#{category}", brand : brand },
+					success : (res) => {
+						$("#getProductList").html(res);
+
+						if(checkedBox){
+							$(".productBrand > .text-red").text("");
+						}
+
+						$("input[type=checkbox]:checked").each((i, input) => {
+							if($("input[type=checkbox]:checked").length - 1 == i)
+								$(".productBrand > .text-red").append($(input).val());
+							else
+								$(".productBrand > .text-red").append($(input).val() + ", ");
+						});
+					},
+					error : (e) => {
+						console.log(e);
+					}
+				})
+			}
+			

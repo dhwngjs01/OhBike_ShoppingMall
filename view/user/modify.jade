@@ -1,0 +1,49 @@
+doctype html
+html
+	head
+		include ../head.jade
+	body
+		#wrap
+			include ../header.jade
+			#contents
+				.wrap
+					#myPage
+						.left
+							h3.title 마이페이지
+							
+							p.user_name #{session.user_name} 님
+							
+							.sideMenu
+								.sideMenuItem
+									p 쇼핑정보
+									ul
+										li
+											a(href="/user/orderInfo") - 주문/배송조회
+										li
+											a(href="/user/basket") - 장바구니
+								.sideMenuItem
+									p 회원정보
+									ul
+										li
+											a(href="/user/modify") - 회원정보수정
+										li
+											a(href="/user/dieMySelf") - 회원탈퇴
+
+						.right
+							#modify
+								table
+									tr
+										td 이름
+										td #{user.user_name}
+									tr
+										td 아이디
+										td #{user.user_id}
+									tr
+										td 비밀번호
+										td
+											button#changePw(type="button") 비밀번호 변경
+									tr
+										td 휴대전화
+
+			include ../footer.jade
+		include ../script.jade
