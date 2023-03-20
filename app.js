@@ -11,9 +11,9 @@
 	var option = {
 		host : 'localhost',
 		port : 3306,
-		user : 'root',
+		user : '201844021',
 		password : 'P@ssw0rd',
-		database : 'SW_201844021',
+		database : 'nodejs_ohbike_shoppingmall',
 		charset : 'utf8'
 	}
 
