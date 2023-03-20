@@ -1,4 +1,4 @@
-var mysql = require('mysql2');
+var mysql = require('mysql');
 
 var db = mysql.createConnection({
 	host : 'localhost', //db주소
