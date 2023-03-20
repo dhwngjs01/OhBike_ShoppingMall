@@ -9,10 +9,10 @@
 	
 	// 세션 설정
 	var option = {
-		host : '114.71.137.109',
+		host : 'localhost',
 		port : 3306,
-		user : '201844021',
-		password : '201844021',
+		user : 'root',
+		password : 'P@ssw0rd',
 		database : 'SW_201844021',
 		charset : 'utf8'
 	}
