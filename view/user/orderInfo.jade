@@ -14,12 +14,12 @@ html
 
 						table#orderInfoList
 							colgroup
-								col(style="width:15%")
 								col(style="width:20%")
+								col(style="width:25%")
 								col(style="width:10%")
 								col(style="width:10%")
-								col(style="width:10%")
-								col(style="width:10%")
+								col(style="width:12.5%")
+								col(style="width:12.5%")
 								col(style="width:10%")
 							thead
 								tr
@@ -34,11 +34,11 @@ html
 									each order, i in orderList
 										tr
 											td
-												img(src="../uploadFiles/#{order.file_save_name}" style="width:100%;")
-											td #{order.product_name}
+												img(src="../uploadFiles/#{order.file_save_name}" style="width:50%;")
+											td.text-left #{order.product_name}
 											td #{order.option_name}
 											td #{order.option_num}
-											td #{order.order_totalPrice.numberWithCommas()}
+											td #{order.order_totalPrice.numberWithCommas()} 원
 											td #{order.order_status}
 											td #{order.order_date.format("yyyy-MM-dd")}
 								- } else {

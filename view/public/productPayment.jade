@@ -42,7 +42,7 @@ html(lang="ko")
 									td #{(2500 * payment.option_num).numberWithCommas()} 원
 									td #{((payment.product_price * payment.option_num) + (2500 * payment.option_num)).numberWithCommas()} 원
 						
-						form#productPaymentForm(action="/public/payment" method="post")
+						form#productPaymentForm(action="/public/payment/final" method="post")
 							input(type="hidden" name="product_no" value="#{payment.product_no}")
 							input(type="hidden" name="option_no" value="#{payment.option_no}")
 							input(type="hidden" name="option_num" value="#{payment.option_num}")

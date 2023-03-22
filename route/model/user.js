@@ -1,181 +1,204 @@
-var db = require('../../db');
+var db = require("../../db");
 
-// 로그인 페이지
+// 로그인 페이지 - /user/login
 exports.login = (req, res) => {
-	if(req.session.user_no){
-		res.send('<script>alert("접근할 수 없는 페이지입니다."); history.back();</script>');
-	} else {
-		res.render("login");
-	}
-}
+  if (req.session.user_no) {
+    res.send(
+      '<script>alert("접근할 수 없는 페이지입니다."); history.back();</script>'
+    );
+  } else {
+    res.render("login");
+  }
+};
 
-// 회원가입 페이지
+// 회원가입 페이지 - /user/join
 exports.join = (req, res) => {
-	if (req.session.user_no) {
-		res.send('<script>alert("접근할 수 없는 페이지입니다."); history.back();</script>');
-	} else {
-		res.render("join");
-	}
-}
+  if (req.session.user_no) {
+    res.send(
+      '<script>alert("접근할 수 없는 페이지입니다."); history.back();</script>'
+    );
+  } else {
+    res.render("join");
+  }
+};
 
-
-// 마이페이지
+// 마이페이지 - /user/mypage
 exports.mypage = (req, res) => {
-	if(req.session.user_no){
-		res.render("mypage");
-	} else {
-		res.send('<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>');
-	}
-}
+  if (req.session.user_no) {
+    res.render("mypage");
+  } else {
+    res.send(
+      '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
+    );
+  }
+};
 
-// 개인정보수정
+// 회원정보수정 - /user/modify
 exports.modify = (req, res) => {
-	user_no = req.session.user_no;
+  user_no = req.session.user_no;
 
-	if(user_no){
-		sql = "select * from user where user_no = ?"
-		db.query(sql, user_no, (err, user) => {
-			if(err){
-				console.log(err);
-			} else {
-				res.render("modify", { user : user[0] });
-			}
-		});
-	} else {
-		res.send('<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>');
-	}
-}
+  if (user_no) {
+    sql = "select * from user where user_no = ?";
+    db.query(sql, user_no, (err, user) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("modify", { user: user[0] });
+      }
+    });
+  } else {
+    res.send(
+      '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
+    );
+  }
+};
 
-
-// 로그아웃
+// 로그아웃 /user/logout
 exports.logout = (req, res) => {
-	req.session.destroy(function(){
-		res.redirect('/');
-	});
-}
+  req.session.destroy(function () {
+    res.redirect("/");
+  });
+};
 
-// 로그인 처리
+// 로그인 처리 - /user/login
 exports.loginPost = (req, res) => {
-	userId = req.body.userId;
-	userPw = req.body.userPw;
-	
-	sql = "select user_no, user_name, count(*) as rowCount from user where user_id = ? and user_pw = ?";
-	db.query(sql, [userId, userPw], (err, result) => {
-		if(err){
-			console.log(err);
-			res.send({ "sqlError" : err });
-		} else {
-			if(result[0].rowCount){
-				req.session.user_no = result[0].user_no; // 세션에 회원번호 저장
-				req.session.user_name = result[0].user_name; // 세션에 회원이름 저장
-				res.send({ "user_name" : req.session.user_name });
-			} else {
-				res.send({ "loginFailed" : true });
-			}
-		}
-	});
-}
+  userId = req.body.userId;
+  userPw = req.body.userPw;
 
-// 아이디 중복 확인
+  sql =
+    "select user_no, user_name, count(*) as rowCount from user where user_id = ? and user_pw = ?";
+  db.query(sql, [userId, userPw], (err, result) => {
+    if (err) {
+      console.log(err);
+      res.send({ sqlError: err });
+    } else {
+      if (result[0].rowCount) {
+        req.session.user_no = result[0].user_no; // 세션에 회원번호 저장
+        req.session.user_name = result[0].user_name; // 세션에 회원이름 저장
+        res.send({ user_name: req.session.user_name });
+      } else {
+        res.send({ loginFailed: true });
+      }
+    }
+  });
+};
+
+// 아이디 중복 확인 처리 - /user/join
 exports.overlapUserId = (req, res) => {
-	userId = req.body.userId;
+  userId = req.body.userId;
 
-	// 아이디 중복 확인
-	sql = "select user_id from user where user_id = ?";
-	db.query(sql, userId, (err, result) => {
-		if(err){
-			console.log(err);
-			res.send(err);
-		} else {
-			if(result[0]){
-				res.send(true);
-			} else {
-				res.send(false);
-			}
-		}
-	});
-}
+  sql = "select user_id from user where user_id = ?";
+  db.query(sql, userId, (err, result) => {
+    if (err) {
+      console.log(err);
+      res.send(err);
+    } else {
+      if (result[0]) {
+        res.send(true);
+      } else {
+        res.send(false);
+      }
+    }
+  });
+};
 
-// 회원가입 처리
+// 회원가입 처리 - /user/join
 exports.joinPost = (req, res) => {
-	userId = req.body.userId;
-	userPw = req.body.userPw;
-	userName = req.body.userName;
-	userPhone = req.body.userPhone;
-	userZipCode = req.body.userZipCode;
-	userAddress = req.body.userAddress;
-	userDetailAddress = req.body.userDetailAddress;
+  userId = req.body.userId;
+  userPw = req.body.userPw;
+  userName = req.body.userName;
+  userPhone = req.body.userPhone;
+  userZipCode = req.body.userZipCode;
+  userAddress = req.body.userAddress;
+  userDetailAddress = req.body.userDetailAddress;
 
-	sql = "insert into user(user_id, user_pw, user_name, user_phone, user_zipcode, user_address, user_detail_address, user_lv) values(?, ?, ?, ?, ?, ?, ?, 'user')";
-	db.query(sql, [ userId, userPw, userName, userPhone, userZipCode, userAddress, userDetailAddress ], (err, result) => {
-		if(err){
-			console.log(err);
-			res.send({ "sqlError" : err });
-		} else {
-			// 영향이 있는 행이 없다면 오류 전송
-			if(result.affectedRows < 1){
-				res.send({ "sqlError" : result });
-			}
+  sql =
+    "insert into user(user_id, user_pw, user_name, user_phone, user_zipcode, user_address, user_detail_address, user_lv) values(?, ?, ?, ?, ?, ?, ?, 'user')";
+  db.query(
+    sql,
+    [
+      userId,
+      userPw,
+      userName,
+      userPhone,
+      userZipCode,
+      userAddress,
+      userDetailAddress,
+    ],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.send({ sqlError: err });
+      } else {
+        // 영향이 있는 행이 없다면 오류 전송
+        if (result.affectedRows < 1) {
+          res.send({ sqlError: result });
+        } else {
+          res.send();
+        }
+      }
+    }
+  );
+};
 
-			res.send();
-		}
-	});
-}
-
-// 장바구니
+// 장바구니 페이지 - /user/basket
 exports.basket = (req, res) => {
-	user_no = req.session.user_no;
+  user_no = req.session.user_no;
 
-	if(user_no){
-		sql = "select count(user_no) as basketListCount from basket, options natural join product natural join image where user_no = ? AND basket.option_no = options.option_no"
-		db.query(sql, user_no, (err, basketListCount) => {
-			if(err){
-				console.log(err);
-			} else {
-				sql = "select distinct * from basket, options natural join product natural join image where user_no = ? AND basket.option_no = options.option_no order by basket_no desc";
-				db.query(sql, user_no, (err, basketList) => {
-					if(err){
-						console.log(err);
-						res.send({ "sqlError" : err });
-					} else {
-						res.render("basket", { basketList: basketList, basketListCount: basketListCount[0].basketListCount });
-					}
-				});
-			}
-		});
-	} else {
-		res.send('<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>');
-	}
-}
+  basketListCount =
+    "select count(user_no) as basketListCount from basket, options natural join product natural join image where user_no = ?;";
+  basketListCountFormat = db.format(basketListCount, user_no);
 
-// 장바구니 상품 삭제
+  basketList =
+    "select basket_no, file_save_name, file_show_name, product_name, option_name, basket.option_num, product_price from basket, options natural join product natural join image where basket.user_no = 2 and basket.option_no = options.option_no order by basket_no desc;";
+  basketListFormat = db.format(basketList, user_no);
+
+  if (user_no) {
+    db.query(basketListCountFormat + basketListFormat, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.render("basket", {
+          basketListCount: result[0][0].basketListCount,
+          basketList: result[1],
+        });
+      }
+    });
+  } else {
+    res.send(
+      '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
+    );
+  }
+};
+
+// 장바구니 상품 삭제 - /user/basket
 exports.basketDeletePost = (req, res) => {
-	user_no = req.session.user_no;
-	basketNo = req.body.basketNo;
+  user_no = req.session.user_no;
+  basketNo = req.body.basketNo;
 
-	if(user_no){
-		sql = "delete from basket where basket_no = ?"
-		db.query(sql, basketNo, (err, result) => {
-			if(err){
-				console.log(err);
-			} else {
-				// 삭제가 성공하면
-				if(result.affectedRows > 0){
-					res.send(true);
-				} else {
-					res.send(false);
-				}
-			}
-		});
-	}
-}
+  if (user_no) {
+    sql = "delete from basket where basket_no = ?";
+    db.query(sql, basketNo, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        // 삭제가 성공하면
+        if (result.affectedRows > 0) {
+          res.send(true);
+        } else {
+          res.send(false);
+        }
+      }
+    });
+  }
+};
 
-// 결제 페이지
+// 결제 페이지 - /product/payment
 exports.payment = (req, res) => {
-	console.log(req.body);
-	res.send(req.body);
+  console.log(req.body);
+  res.send(req.body);
 
-	/*
+  /*
 	basketNo = req.body.basketNo;
 
 	if (req.session.user_no) {
@@ -191,24 +214,28 @@ exports.payment = (req, res) => {
 		res.send('<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>');
 	}
 	*/
-}
+};
 
+// 주문 조회 페이지 - /user/orderInfo
 exports.orderInfo = (req, res) => {
-	user_no = req.session.user_no
+  user_no = req.session.user_no;
 
-	sql = "select count(user_no) as orderInfoListCount from orders where user_no = ?";
-	db.query(sql, user_no, (err, result) => {
-		if(err){
-			console.log(err);
-		} else {
-			sql = "select * from orders natural join product natural join options natural join image natural join detail where user_no = ?";
-			db.query(sql, user_no, (err, orderList) => {
-				if(err){
-					console.log(err);
-				} else {
-					res.render("orderInfo", { orderList: orderList, orderInfoListCount: result[0].orderInfoListCount });
-				}
-			});
-		}
-	});
-}
+  orderListCount =
+    "select count(user_no) as orderInfoListCount from orders where user_no = ?;";
+  orderListCountFormat = db.format(orderListCount, user_no);
+
+  orderListSql =
+    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date FROM orders, detail, options, product, image WHERE orders.order_no = detail.order_no AND detail.option_no = options.option_no AND options.product_no = product.product_no AND product.product_no = image.product_no AND user_no = 2;";
+  orderListSqlFormat = db.format(orderListSql, user_no);
+
+  db.query(orderListCountFormat + orderListSqlFormat, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("orderInfo", {
+        orderList: result[1],
+        orderInfoListCount: result[0][0].orderInfoListCount,
+      });
+    }
+  });
+};

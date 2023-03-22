@@ -47,7 +47,12 @@ html
 												td #{basket.option_name}
 												td #{basket.option_num} 개
 												td #{(basket.product_price * basket.option_num).numberWithCommas()} 원
-												td #{(2500 * basket.option_num).numberWithCommas()} 원
+												td
+													- if(basket.product_price * basket.option_num > 50000){
+														|0 원
+													- } else {
+														| #{(2500 * basket.option_num).numberWithCommas()} 원
+													- }
 												td
 													button.btnOrderProduct(type="submit" name="basketNo" value="#{basket.basket_no}") 주문하기
 													button.btnDeleteProduct(type="button" data-basket-no="#{basket.basket_no}") 삭제하기
