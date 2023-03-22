@@ -39,8 +39,18 @@ html(lang="ko")
 										input#optionNum(type="text" name="option_num" value="#{payment.option_num}" min="1" max="#{payment.option_max}")
 										span 개
 									td #{payment.product_price.numberWithCommas()} 원
-									td #{(2500 * payment.option_num).numberWithCommas()} 원
-									td #{((payment.product_price * payment.option_num) + (2500 * payment.option_num)).numberWithCommas()} 원
+									td
+										- if(payment.product_price * payment.option_num > 50000){
+											| 0 원
+										- } else {
+											| {(2500 * payment.option_num).numberWithCommas()} 원
+										- }
+									td
+										- if(payment.product_price * payment.option_num > 50000){
+											| #{(payment.product_price * payment.option_num).numberWithCommas()} 원
+										- } else {
+											| #{(payment.product_price * payment.option_num + (2500 * payment.option_num)).numberWithCommas()} 원
+										- }
 						
 						form#productPaymentForm(action="/public/payment/final" method="post")
 							input(type="hidden" name="product_no" value="#{payment.product_no}")
@@ -111,12 +121,22 @@ html(lang="ko")
 										i.fas.fa-plus
 									li
 										h3 배송비
-										p #{(2500 * payment.option_num).numberWithCommas()} 원
+										p
+											- if(payment.product_price * payment.option_num > 50000){
+												| 0 원
+											- } else {
+												| {(2500 * payment.option_num).numberWithCommas()} 원
+											- }
 									li
 										i.fas.fa-equals
 									li
 										h3 최종 결제금액
-										p.text-red #{(payment.product_price * payment.option_num + (2500 * payment.option_num)).numberWithCommas()} 원
+										p.text-red
+											- if(payment.product_price * payment.option_num > 50000){
+												| #{(payment.product_price * payment.option_num).numberWithCommas()} 원
+											- } else {
+												| #{(payment.product_price * payment.option_num + (2500 * payment.option_num)).numberWithCommas()} 원
+											- }
 							
 							#productPaymentBtnList
 								button(type="submit") 결제하기

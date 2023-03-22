@@ -11,29 +11,27 @@ html
 						.title
 							i.fas.fa-shopping-basket
 							h2 장바구니
-
-						form(action="/user/payment", method="post")
-							table#basketList
-								colgroup
-									col(style="width:5%")
-									col(style="width:15%")
-									col(style="width:20%")
-									col(style="width:10%")
-									col(style="width:10%")
-									col(style="width:10%")
-									col(style="width:10%")
-									col(style="width:10%")
-								thead
-									tr
-										th(colspan="3") 상품
-										th 사이즈
-										th 수량
-										th 가격
-										th 배송비
-										th 주문
-								tbody
-									- if(basketListCount > 0){
-										each basket in basketList
+						table#basketList
+							colgroup
+								col(style="width:5%")
+								col(style="width:15%")
+								col(style="width:20%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+								col(style="width:10%")
+							thead
+								tr
+									th(colspan="3") 상품
+									th 사이즈
+									th 수량
+									th 가격
+									th 배송비
+									th 주문
+							tbody
+								- if(basketListCount > 0){
+									each basket in basketList
 											tr
 												td
 													input(type="checkbox" name="basketNo" id="basketNo#{basket.basket_no}" value="#{basket.basket_no}")
@@ -56,23 +54,27 @@ html
 												td
 													button.btnOrderProduct(type="button" onclick="basketItemBuy(this)" data-option_no="#{basket.option_no}" data-option_num="#{basket.option_num}") 주문하기
 													button.btnDeleteProduct(type="button" data-basket-no="#{basket.basket_no}") 삭제하기
-									- } else {
-										tr
-											td(colspan="8") 장바구니에 담긴 상품이 없습니다
-									- }
-							- if(basketListCount > 0){
-								#basketBtnList
-									.left
-										input#allSelect(type="checkbox")
-										label.allSelectIcon(for="allSelect")
-											i.far.fa-square.notChecked
-											i.fas.fa-check-square.checked
-										label.allSelectText(for="allSelect") 전체선택
-										button.btnRemoveSelected(type="button") 선택한 상품 삭제하기
-									.right
-										button.btnSelectedOrder(type="submit") 선택한 상품 주문
-										button.btnAllOrder(type="button") 전체 주문
-							- }
+													form(action="/public/payment" method="post" style="display:none;")
+														input(type="hidden" name="directPayment" value="true")
+														input(type="hidden" name="optionNo" value="#{basket.option_no}")
+														input(type="hidden" name="optionNum" value="#{basket.option_num}")
+								- } else {
+									tr
+										td(colspan="8") 장바구니에 담긴 상품이 없습니다
+								- }
+						- if(basketListCount > 0){
+							#basketBtnList
+								.left
+									input#allSelect(type="checkbox")
+									label.allSelectIcon(for="allSelect")
+										i.far.fa-square.notChecked
+										i.fas.fa-check-square.checked
+									label.allSelectText(for="allSelect") 전체선택
+									button.btnRemoveSelected(type="button") 선택한 상품 삭제하기
+								.right
+									button.btnSelectedOrder(type="submit") 선택한 상품 주문
+									button.btnAllOrder(type="button") 전체 주문
+						- }
 
 			include ../footer.jade
 		include ../script.jade
@@ -122,13 +124,8 @@ html
 				}
 			}
 
-			//- basketItemBuy = (self) => {
-			//- 	optionNo = $(self).data("option_no");
-			//- 	optionNum = $(self).data("option_num");
-				
-
-			//- 	basketItemFormData = new FormData();
-			//- 	basketItemFormData.append("directPayment", true);
-			//- 	basketItemFormData.append("optionNo", optionNo);
-			//- 	basketItemFormData.append("optionNum", optionNum);
-			//- }
+			basketItemBuy = (self) => {
+				if(confirm("해당 물품을 구매하시겠습니까?")){
+					$(self).parent().find("form").submit();
+				}
+			}
