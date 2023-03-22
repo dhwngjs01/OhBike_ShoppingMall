@@ -54,13 +54,12 @@ html
 														| #{(2500 * basket.option_num).numberWithCommas()} 원
 													- }
 												td
-													button.btnOrderProduct(type="submit" name="basketNo" value="#{basket.basket_no}") 주문하기
+													button.btnOrderProduct(type="button" onclick="basketItemBuy(this)" data-option_no="#{basket.option_no}" data-option_num="#{basket.option_num}") 주문하기
 													button.btnDeleteProduct(type="button" data-basket-no="#{basket.basket_no}") 삭제하기
 									- } else {
 										tr
 											td(colspan="8") 장바구니에 담긴 상품이 없습니다
 									- }
-							
 							- if(basketListCount > 0){
 								#basketBtnList
 									.left
@@ -87,6 +86,7 @@ html
 					$("input[name=basketNo]").prop("checked", false);
 				}
 			});
+
 
 			$(".btnDeleteProduct").click(function(e){
 				self = $(this);
@@ -121,3 +121,14 @@ html
 					$("#basketList tbody").append('<tr><td colspan="8">장바구니에 담긴 상품이 없습니다</td></tr>');
 				}
 			}
+
+			//- basketItemBuy = (self) => {
+			//- 	optionNo = $(self).data("option_no");
+			//- 	optionNum = $(self).data("option_num");
+				
+
+			//- 	basketItemFormData = new FormData();
+			//- 	basketItemFormData.append("directPayment", true);
+			//- 	basketItemFormData.append("optionNo", optionNo);
+			//- 	basketItemFormData.append("optionNum", optionNum);
+			//- }

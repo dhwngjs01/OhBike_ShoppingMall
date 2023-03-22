@@ -150,7 +150,7 @@ exports.basket = (req, res) => {
   basketListCountFormat = db.format(basketListCount, user_no);
 
   basketList =
-    "select basket_no, file_save_name, file_show_name, product_name, option_name, basket.option_num, product_price from basket, options natural join product natural join image where basket.user_no = 2 and basket.option_no = options.option_no order by basket_no desc;";
+    "select basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price from basket, options natural join product natural join image where basket.user_no = 2 and basket.option_no = options.option_no order by basket_datetime desc, basket_no desc;";
   basketListFormat = db.format(basketList, user_no);
 
   if (user_no) {
@@ -225,7 +225,7 @@ exports.orderInfo = (req, res) => {
   orderListCountFormat = db.format(orderListCount, user_no);
 
   orderListSql =
-    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date FROM orders, detail, options, product, image WHERE orders.order_no = detail.order_no AND detail.option_no = options.option_no AND options.product_no = product.product_no AND product.product_no = image.product_no AND user_no = 2;";
+    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date from orders, detail, options, product, image where orders.order_no = detail.order_no and detail.option_no = options.option_no and options.product_no = product.product_no and product.product_no = image.product_no and user_no = ? order by order_date desc;";
   orderListSqlFormat = db.format(orderListSql, user_no);
 
   db.query(orderListCountFormat + orderListSqlFormat, (err, result) => {

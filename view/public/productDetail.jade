@@ -35,7 +35,7 @@ html
 													option(value="", selected) 사이즈 선택
 													each option, i in optionList
 														- if(option.option_num > 0)
-															option(value="#{option.option_no}", data-maxnum="#{option.option_max}") #{option.option_name}
+															option(value="#{option.option_no}", data-maxnum="#{option.option_num}") #{option.option_name}
 														- else
 															option(value="", disabled) #{option.option_name} [품절]
 										ul.productNum

@@ -40,7 +40,7 @@ html
 											td #{order.option_num}
 											td #{order.order_totalPrice.numberWithCommas()} 원
 											td #{order.order_status}
-											td #{order.order_date.format("yyyy-MM-dd")}
+											td #{order.order_date.format("yyyy-MM-dd HH:mm:ss")}
 								- } else {
 									tr
 										td(colspan="8") 주문한 상품이 없습니다.

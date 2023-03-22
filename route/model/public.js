@@ -90,7 +90,8 @@ exports.payment = (req, res) => {
   productNo = req.body.productNo;
   optionNo = req.body.optionNo;
   optionNum = req.body.optionNum;
-  optionMax = req.body.optionMax;
+
+  console.log(req.body);
 
   // true == 바로구매 버튼 클릭으로 폼을 전송했을 시
   // false == 장바구니 버튼 클릭으로 폼을 전송했을 시
@@ -103,8 +104,8 @@ exports.payment = (req, res) => {
         console.log(err);
       } else {
         sql =
-          "select * from product natural join options natural join image where product_no = ? AND option_no = ?";
-        db.query(sql, [productNo, optionNo], (err, payment) => {
+          "select * from product natural join options natural join image where option_no = ?";
+        db.query(sql, [optionNo], (err, payment) => {
           if (err) {
             console.log(err);
             res.send({ sqlError: err });
@@ -121,25 +122,22 @@ exports.payment = (req, res) => {
     });
   } else if (directPayment == "false") {
     basketItemCountSql =
-      "select count(*) as basketItemCount from basket where user_no = ? and product_no = ? and option_no = ?";
-    basketItemCountFormat = db.format(basketItemCountSql, [
-      userNo,
-      productNo,
-      optionNo,
-    ]);
+      "select basket_no, count(*) as basketItemCount from basket where user_no = ? and option_no = ?";
+    basketItemCountFormat = db.format(basketItemCountSql, [userNo, optionNo]);
 
     db.query(basketItemCountFormat, (err, result) => {
       if (err) {
         console.log(err);
       } else {
+        basketNo = result[0].basket_no;
         basketItemCount = result[0].basketItemCount;
 
         if (basketItemCount > 0) {
           updateBasketItemOptionNumSql =
-            "update basket set option_num = option_num + ? where user_no = ? and product_no = ?";
+            "update basket set option_num = option_num + ? where user_no = ? and basket_no = ?";
           updateBasketItemOptionNumSqlFormat = db.format(
             updateBasketItemOptionNumSql,
-            [optionNum, userNo, productNo]
+            [optionNum, userNo, basketNo]
           );
 
           db.query(updateBasketItemOptionNumSqlFormat, (err, result) => {
@@ -148,6 +146,10 @@ exports.payment = (req, res) => {
             } else {
               if (result.affectedRows > 0) {
                 res.redirect("/user/basket");
+              } else {
+                res.send(
+                  '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
+                );
               }
             }
           });
@@ -165,12 +167,11 @@ exports.payment = (req, res) => {
             if (err) {
               console.log(err);
             } else {
-              console.log(result);
               if (result.affectedRows > 0) {
                 res.redirect("/user/basket");
               } else {
                 res.send(
-                  '<script>alert("장바구니에 담는데 실패했습니다."); history.back()</script>'
+                  '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
                 );
               }
             }
