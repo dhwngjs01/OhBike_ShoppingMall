@@ -28,13 +28,13 @@ CREATE TABLE IF NOT EXISTS `basket` (
   `option_num` int(11) NOT NULL,
   `basket_datetime` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`basket_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- 테이블 데이터 nodejs_ohbike_shoppingmall.basket:~2 rows (대략적) 내보내기
 DELETE FROM `basket`;
 INSERT INTO `basket` (`basket_no`, `user_no`, `product_no`, `option_no`, `option_num`, `basket_datetime`) VALUES
-	(9, 2, 1, 1, 6, '2023-03-23 03:02:09'),
-	(10, 2, 1, 2, 2, '2023-03-23 03:02:15');
+	(27, 2, 1, 1, 2, '2023-03-24 07:27:07'),
+	(28, 2, 1, 2, 1, '2023-03-24 07:17:35');
 
 -- 테이블 nodejs_ohbike_shoppingmall.detail 구조 내보내기
 CREATE TABLE IF NOT EXISTS `detail` (
@@ -42,12 +42,12 @@ CREATE TABLE IF NOT EXISTS `detail` (
   `product_no` int(11) NOT NULL,
   `order_no` int(11) NOT NULL,
   `option_no` int(11) NOT NULL,
-  `product_price` int(11) NOT NULL,
   `option_num` int(11) NOT NULL,
+  `product_price` int(11) NOT NULL,
   PRIMARY KEY (`detail_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
--- 테이블 데이터 nodejs_ohbike_shoppingmall.detail:~3 rows (대략적) 내보내기
+-- 테이블 데이터 nodejs_ohbike_shoppingmall.detail:~0 rows (대략적) 내보내기
 DELETE FROM `detail`;
 
 -- 테이블 nodejs_ohbike_shoppingmall.image 구조 내보내기
@@ -101,8 +101,8 @@ CREATE TABLE IF NOT EXISTS `options` (
 -- 테이블 데이터 nodejs_ohbike_shoppingmall.options:~2 rows (대략적) 내보내기
 DELETE FROM `options`;
 INSERT INTO `options` (`option_no`, `product_no`, `option_name`, `option_num`) VALUES
-	(1, 1, 'S', 9),
-	(2, 1, 'M', 12);
+	(1, 1, 'S', 9931),
+	(2, 1, 'M', 9905);
 
 -- 테이블 nodejs_ohbike_shoppingmall.orders 구조 내보내기
 CREATE TABLE IF NOT EXISTS `orders` (
@@ -118,9 +118,9 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `order_msg` text DEFAULT NULL,
   `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`order_no`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
--- 테이블 데이터 nodejs_ohbike_shoppingmall.orders:~3 rows (대략적) 내보내기
+-- 테이블 데이터 nodejs_ohbike_shoppingmall.orders:~0 rows (대략적) 내보내기
 DELETE FROM `orders`;
 
 -- 테이블 nodejs_ohbike_shoppingmall.product 구조 내보내기
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 -- 테이블 데이터 nodejs_ohbike_shoppingmall.sessions:~1 rows (대략적) 내보내기
 DELETE FROM `sessions`;
 INSERT INTO `sessions` (`session_id`, `expires`, `data`) VALUES
-	('HKCWmT8uNYgRI7M9Qw2a5z0mnfhhArFj', 1679597493, '{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user_no":2,"user_name":"관리자"}');
+	('HKCWmT8uNYgRI7M9Qw2a5z0mnfhhArFj', 1679696828, '{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user_no":2,"user_name":"관리자"}');
 
 -- 테이블 nodejs_ohbike_shoppingmall.user 구조 내보내기
 CREATE TABLE IF NOT EXISTS `user` (
