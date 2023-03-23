@@ -34,7 +34,7 @@ html
 									each basket in basketList
 											tr
 												td
-													input(type="checkbox" name="basketNo" id="basketNo#{basket.basket_no}" value="#{basket.basket_no}")
+													input(type="checkbox" name="basketNo" id="basketNo#{basket.basket_no}" value="#{basket.basket_no}" data-option-no="#{basket.option_no}" data-option-num="#{basket.option_num}")
 													label(for="basketNo#{basket.basket_no}")
 														i.far.fa-square.notChecked
 														i.fas.fa-check-square.checked
@@ -56,29 +56,54 @@ html
 													button.btnDeleteProduct(type="button" data-basket-no="#{basket.basket_no}") 삭제하기
 													form(action="/public/payment" method="post" style="display:none;")
 														input(type="hidden" name="directPayment" value="true")
-														input(type="hidden" name="optionNo" value="#{basket.option_no}")
-														input(type="hidden" name="optionNum" value="#{basket.option_num}")
+														input(type="hidden" name="basket_no_list[]" value="#{basket.basket_no}")
+														input(type="hidden" name="optionNo[]" value="#{basket.option_no}")
+														input(type="hidden" name="optionNum[]" value="#{basket.option_num}")
 								- } else {
 									tr
 										td(colspan="8") 장바구니에 담긴 상품이 없습니다
 								- }
 						- if(basketListCount > 0){
 							#basketBtnList
-								.left
-									input#allSelect(type="checkbox")
-									label.allSelectIcon(for="allSelect")
-										i.far.fa-square.notChecked
-										i.fas.fa-check-square.checked
-									label.allSelectText(for="allSelect") 전체선택
-									button.btnRemoveSelected(type="button") 선택한 상품 삭제하기
-								.right
-									button.btnSelectedOrder(type="submit") 선택한 상품 주문
-									button.btnAllOrder(type="button") 전체 주문
+								form#multiplePayment(action="/public/payment" method="post")
+									.left
+										input#allSelect(type="checkbox")
+										label.allSelectIcon(for="allSelect")
+											i.far.fa-square.notChecked
+											i.fas.fa-check-square.checked
+										label.allSelectText(for="allSelect") 전체선택
+										button.btnRemoveSelected(type="button") 선택한 상품 삭제하기
+									.right
+										button.btnSelectedOrder(type="submit") 선택한 상품 주문
+										button.btnAllOrder(type="submit") 전체 주문
+								
 						- }
 
 			include ../footer.jade
 		include ../script.jade
+		- if(optionNumError){
+			script.
+				alert("#{optionNumError}");
+		- }
 		script.
+			// 장바구니 삭제 상품 요소 삭제 함수
+			basketRemove = (productIndex) => {
+				$("#basketList tbody tr").eq(productIndex).remove();
+				basketListLength = $("#basketList tbody tr").length;
+
+				if(basketListLength == 0){
+					$("#basketList tbody").append('<tr><td colspan="8">장바구니에 담긴 상품이 없습니다</td></tr>');
+				}
+			}
+
+			// 장바구니 상품 구매 함수
+			basketItemBuy = (self) => {
+				if(confirm("해당 상품을 구매하시겠습니까?")){
+					$(self).parent().find("form").submit();
+				}
+			}
+
+			// 장바구니 전체선택 체크박스 클릭
 			$("#allSelect").change(function(){
 				isChecked = $(this).prop("checked");
 
@@ -89,22 +114,33 @@ html
 				}
 			});
 
-
+			// 삭제하기 버튼 클릭
 			$(".btnDeleteProduct").click(function(e){
-				self = $(this);
-				productIndex = $(self).parents("tr").index();
+				self = $(this); // 선택한 상품의 버튼
+				productIndex = $(self).parents("tr").index(); // 선택한 상품의 인덱스
 
+				// 선택한 상품 삭제 확인
 				if(confirm("해당 물품을 삭제하시겠습니까?")){
-					basketNo = $(this).data("basket-no");
-					basketNoList = [];
-					basketNoList.push(basketNo);
+					basket_no = $(this).data("basket-no"); // 선택한 상품의 장바구니 번호
+					basket_no_list = []; // 선택한 상품의 장바구니 번호 배열
+					basket_no_list.push(basket_no); // 선택한 상품의 장바구니 번호 배열에 추가
+					basket_no_list = JSON.stringify(basket_no_list); // 선택한 상품의 장바구니 번호 배열을 JSON 문자열로 변환
 
+					// 선택한 상품 삭제 요청 및 응답 처리
 					$.ajax({
 						type : "POST",
 						url : "/user/basket/delete",
-						data : { basketNoList : basketNoList },
+						data : { basket_no_list : basket_no_list },
 						success : (res) => {
+							// 데이터베이스 오류로 장바구니 물품 삭제를 실패한 경우
+							if(res.sqlError){
+								alert("데이터베이스 오류로 장바구니 물품 삭제를 실패했습니다.");
+								return;
+							}
+
+							// 장바구니 물품 삭제를 성공한 경우
 							if(res){
+								alert("장바구니 물품 삭제를 성공했습니다.");
 								basketRemove(productIndex);
 							} else {
 								alert("알 수 없는 오류로 장바구니 물품 삭제를 실패했습니다.");
@@ -117,42 +153,34 @@ html
 				}
 			});
 
-			basketRemove = (productIndex) => {
-				$("#basketList tbody tr").eq(productIndex).remove();
-				basketListLength = $("#basketList tbody tr").length;
-
-				if(basketListLength == 0){
-					$("#basketList tbody").append('<tr><td colspan="8">장바구니에 담긴 상품이 없습니다</td></tr>');
-				}
-			}
-
-			basketItemBuy = (self) => {
-				if(confirm("해당 물품을 구매하시겠습니까?")){
-					$(self).parent().find("form").submit();
-				}
-			}
-
+			// 선택한 상품 삭제하기 버튼 클릭
 			$(".btnRemoveSelected").click(() => {
+				// 선택한 상품이 없는 경우
 				if($("input[name=basketNo]:checked").length == 0){
-					alert("삭제할 물품을 선택해주세요.");
+					alert("삭제할 상품을 선택해주세요.");
 					return;
 				}
 
-				if(confirm("선택한 물품을 삭제하시겠습니까?")){
-					basket_no_list = [];
+				// 선택한 상품 삭제 확인
+				if(confirm("선택한 상품을 삭제하시겠습니까?")){
+					basket_no_list = []; // 선택한 상품의 장바구니 번호 배열
 
+					// 선택한 상품의 장바구니 번호 배열에 추가
 					$("input[name=basketNo]:checked").each(function(){
 						basket_no_list.push($(this).val());
 					});
 
-					basket_no_list = JSON.stringify(basket_no_list);
+					basket_no_list = JSON.stringify(basket_no_list); // 선택한 상품의 장바구니 번호 배열을 JSON 문자열로 변환
 
+					// 선택한 상품 삭제 요청 및 응답 처리
 					$.ajax({
 						type : "POST",
 						url : "/user/basket/delete",
 						data : { basket_no_list : basket_no_list },
 						success : (res) => {
+							// 장바구니 상품 삭제를 성공한 경우
 							if(res){
+								// 삭제할 상품 요소 제거
 								$("input[name=basketNo]:checked").each(function(){
 									basketRemove($(this).parents("tr").index());
 								});
@@ -164,5 +192,53 @@ html
 							console.log(e);
 						}
 					});
+				}
+			});
+
+			// 선택한 상품 구매하기 버튼 클릭
+			$("#multiplePayment").submit(() => {
+				// 장바구니에 상품이 없는 경우
+				if($("input[name=basketNo]").length == 0){
+					alert("장바구니에 상품이 없습니다.");
+					return false;
+				}
+
+
+				$("#multiplePayment").find("input[type=hidden]").remove();
+				$("#multiplePayment").append('<input type="hidden" name="directPayment" value="true">');
+
+				$("input[name=basketNo]:checked").each((i, checkbox) => {
+					basket_no = $(checkbox).val(); // 상품의 장바구니 번호
+					option_no = $(checkbox).data("option-no"); // 상품의 옵션 번호
+					option_num = $(checkbox).data("option-num"); // 상품의 옵션 수량
+
+					inputBasketNo = '<input type="hidden" name="basket_no_list[]" value="' + basket_no + '">';
+					inputOptionNo = '<input type="hidden" name="optionNo[]" value="' + option_no + '">';
+					inputOptionNum = '<input type="hidden" name="optionNum[]" value="' + option_num + '">';
+
+					inputHtml = inputBasketNo + inputOptionNo + inputOptionNum
+
+					$("#multiplePayment").append(inputHtml);
+				});
+			});
+
+			$(".btnSelectedOrder").click(() => {
+				// 선택한 상품이 없는 경우
+				if($("input[name=basketNo]:checked").length == 0){
+					alert("주문할 상품을 선택해주세요.");
+					return false;
+				}
+
+				// 선택한 상품 주문 확인
+				if(!confirm("선택한 상품을 주문하시겠습니까?")){
+					return false;
+				}
+			});
+
+			$(".btnAllOrder").click(() => {
+				if(confirm("선택한 상품을 주문하시겠습니까?")){
+					$("input[name=basketNo]").prop("checked", true);
+				} else {
+					return false;
 				}
 			});

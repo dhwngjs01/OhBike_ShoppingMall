@@ -30,34 +30,45 @@ html(lang="ko")
 									th 배송비
 									th 최종가격
 							tbody
-								tr
-									td
-										img(src="../uploadFiles/#{payment.file_save_name}", alt="#{payment.file_show_name}" style="width:100%;")
-									td #{payment.product_name}
-									td #{payment.option_name}
-									td
-										input#optionNum(type="text" name="option_num" value="#{payment.option_num}" min="1" max="#{payment.option_max}")
-										span 개
-									td #{payment.product_price.numberWithCommas()} 원
-									td
-										- if(payment.product_price * payment.option_num > 50000){
-											| 0 원
-										- } else {
-											| {(2500 * payment.option_num).numberWithCommas()} 원
-										- }
-									td
-										- if(payment.product_price * payment.option_num > 50000){
-											| #{(payment.product_price * payment.option_num).numberWithCommas()} 원
-										- } else {
-											| #{(payment.product_price * payment.option_num + (2500 * payment.option_num)).numberWithCommas()} 원
-										- }
+								- if(product_list.size > 0){
+									- each product, i in product_list
+										tr
+											td
+												img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}" style="width:100%;")
+											td #{product.product_name}
+											td #{product.option_name}
+											td
+												//- input#optionNum(type="text" value="#{payment.selected_option_num}" min="1" max="#{payment.option_max}")
+												| #{product.selected_option_num} 개
+											td #{product.product_price.numberWithCommas()} 원
+											td
+												- if(product.product_price * product.selected_option_num > 50000){
+													| 0 원
+												- } else {
+													| {(2500 * product.selected_option_num).numberWithCommas()} 원
+												- }
+											td
+												- if(product.product_price * product.selected_option_num > 50000){
+													| #{(product.product_price * product.selected_option_num).numberWithCommas()} 원
+												- } else {
+													| #{(product.product_price * product.selected_option_num + (2500 * product.selected_option_num)).numberWithCommas()} 원
+												- }
+								- } else {
+									script.
+										history.back();
+								- }
 						
 						form#productPaymentForm(action="/public/payment/final" method="post")
-							input(type="hidden" name="product_no" value="#{payment.product_no}")
-							input(type="hidden" name="option_no" value="#{payment.option_no}")
-							input(type="hidden" name="option_num" value="#{payment.option_num}")
-							input(type="hidden" name="product_price" value="#{payment.product_price}")
-							input(type="hidden" name="order_totalPrice" value="#{(payment.product_price * payment.option_num) + (2500 * payment.option_num)}")
+							input(type="hidden" name="payment_size" value="#{product_list.size}")
+							input(type="hidden" name="total_product_price" value="#{product_list.total_product_price}")
+							- each product, i in product_list
+								input(type="hidden" name="product_no[]" value="#{product.product_no}")
+								input(type="hidden" name="option_no[]" value="#{product.option_no}")
+								input(type="hidden" name="option_num[]" value="#{product.selected_option_num}")
+								input(type="hidden" name="product_price[]" value="#{product.product_price}")
+							- each basket_no, i in basket_no_list
+								input(type="hidden" name="basket_no_list[]" value="#{basket_no}")
+
 
 							#productPaymentDelivery
 								#orderInfo
@@ -116,26 +127,26 @@ html(lang="ko")
 								ul
 									li
 										h3 주문 금액
-										p #{(payment.product_price * payment.option_num).numberWithCommas()} 원
+										p #{(product_list.total_product_price).numberWithCommas()} 원
 									li
 										i.fas.fa-plus
 									li
 										h3 배송비
 										p
-											- if(payment.product_price * payment.option_num > 50000){
+											- if(product_list.total_product_price > 50000){
 												| 0 원
 											- } else {
-												| {(2500 * payment.option_num).numberWithCommas()} 원
+												| #{(2500 * product_list.size).numberWithCommas()} 원
 											- }
 									li
 										i.fas.fa-equals
 									li
 										h3 최종 결제금액
 										p.text-red
-											- if(payment.product_price * payment.option_num > 50000){
-												| #{(payment.product_price * payment.option_num).numberWithCommas()} 원
+											- if(product_list.total_product_price > 50000){
+												| #{(product_list.total_product_price).numberWithCommas()} 원
 											- } else {
-												| #{(payment.product_price * payment.option_num + (2500 * payment.option_num)).numberWithCommas()} 원
+												| #{(product_list.total_product_price + (2500 * product_list.size)).numberWithCommas()} 원
 											- }
 							
 							#productPaymentBtnList
@@ -147,24 +158,25 @@ html(lang="ko")
 		include ../script.jade
 		script(src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js")
 		script.
-			$("#optionNum").spinner();
+			//- // 숫자만 입력 가능
+			//- $("#optionNum").spinner();
 
-			$("#optionNum").keyup(function(e){
-				onlyNumber($(this), e);
-			}).keydown(function(e){
-				onlyNumber($(this), e);
-			});
+			//- // 키보드로 숫자만 입력 가능
+			//- $("#optionNum").keyup(function(e){
+			//- 	onlyNumber($(this), e);
+			//- }).keydown(function(e){
+			//- 	onlyNumber($(this), e);
+			//- });
 
+			// 주소 찾기 버튼 클릭 시
 			$("#btnFindAddress").click(function(){
 				daumPostCode();
 			});
 
+			// 주소 찾기 API 호출 함수
 			daumPostCode = () => {
 				new daum.Postcode({
 					oncomplete: function(data) {
-						// 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
-						// 예제를 참고하여 다양한 활용법을 확인해 보세요.
-
 						$("#order_ship_zipcode").val(data.zonecode);
 						$("#order_ship_address").val(data.roadAddress);
 						$("#order_ship_detail_address").val(data.buildingName);
@@ -174,22 +186,44 @@ html(lang="ko")
 				}).open();
 			}
 
-			$("#productPaymentForm").submit(function(){
-				var phoneFormat = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
+			// 결제하기 버튼 클릭 시
+			$("#productPaymentForm").submit(function(e){
+				e.preventDefault();
+				// 주문자 정보 유효성 검사 (휴대전화)
+				phoneFormat = /^[0-9]{3}-[0-9]{4}-[0-9]{4}$/;
 				if(!phoneFormat.test($("#order_ship_phone").val())){
 					alert("휴대전화 입력 란의 형식에 맞게 입력해주세요.\nex) 010-1234-1234")
+					return false;
+				}
+
+				if($("#order_ship_zipcode").val() == "" || $("#order_ship_address").val() == ""){
+					alert("주소를 입력해주세요.");
 					return false;
 				}
 
 				$.ajax({
 					type : "POST",
 					url : "/public/payment/final",
-					data : $(this).serialize(),
+					data : $(this).serializeArray(),
 					success : (res) => {
-						if(res.ordersInsertFailed && res.detailInsertFailed){
+						console.log(res);
+
+						if(res.ordersInsertFailed || res.detailInsertFailed){
 							alert("결제 실패했습니다.");
 							return false;
-						} else if(res.orderSuccess){
+						}
+
+						if(res.optionsUpdateFailed){
+							alert("상품 수량 감소를 실패했습니다.");
+							return false;
+						}
+						
+						if(res.basketDeleteFailed){
+							alert("장바구니에 담긴 상품이 삭제되지 않았습니다.");
+							return false;
+						}
+						
+						if(res.orderSuccess){
 							alert("결제 완료되었습니다.");
 							link("/user/orderInfo");
 						}

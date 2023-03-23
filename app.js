@@ -25,7 +25,7 @@
   app.use("/", express.static(__dirname + "/resources")); // resources 경로
   app.use("/images", express.static(__dirname + "/resources/images")); // images 경로
   app.use("/uploadFiles", express.static(__dirname + "/resources/uploadFiles")); // uploadFiles 경로
-  app.use(bodyParser.urlencoded({ extended: false })); // post 방식 사용시 req.body로 값을 받아오기 위해 사용
+  app.use(bodyParser.urlencoded({ extended: true })); // post 방식 사용시 req.body로 값을 받아오기 위해 사용
   app.use(bodyParser.json()); // post 방식 사용 시 req.body로 값을 받아오기위해 사용
 
   // 세션

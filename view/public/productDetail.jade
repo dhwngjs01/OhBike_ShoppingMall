@@ -19,7 +19,7 @@ html
 									p.product_en_name #{product.product_en_name}
 								.productBuyArea
 									form#productBuyForm(action="/public/payment", method="post")
-										input(type="hidden" name="productNo" value="#{product.product_no}")
+										input(type="hidden" name="productNo[]" value="#{product.product_no}")
 										ul.productPrice
 											li 판매가격
 											li
@@ -31,7 +31,7 @@ html
 										ul.productOption
 											li 사이즈
 											li
-												select#optionNo(name="optionNo")
+												select#optionNo(name="optionNo[]")
 													option(value="", selected) 사이즈 선택
 													each option, i in optionList
 														- if(option.option_num > 0)
@@ -41,7 +41,7 @@ html
 										ul.productNum
 											li 수량
 											li
-												input(type="text", name="optionNum", id="optionNum", value="0", min="0")
+												input(type="text", name="optionNum[]", id="optionNum", value="0", min="0")
 										ul.productBuyBtns
 											- if(session.user_no){
 												li
@@ -62,18 +62,22 @@ html
 			include ../footer.jade
 		include ../script.jade
 		script.
+
 			$(function(){
+				// 수량 증감
 				$("#optionNum").spinner();
 
+				// 숫자만 입력
 				$("#optionNum").keyup(function(e){
 					onlyNumber($(this), e);
 				}).keydown(function(e){
 					onlyNumber($(this), e);
 				});
 
+				// 사이즈 선택 시
 				$("#optionNo").change(function(){
-					let option = $(this).val();
-					let maxNum = $(this).find("option:selected").data("maxnum");
+					option = $(this).val();
+					maxNum = $(this).find("option:selected").data("maxnum");
 
 					if(option.length > 0){
 						$("#optionNum").spinner({
@@ -88,18 +92,23 @@ html
 							min : 0
 						}).val(0);
 					}
+
+					$("#optionNo").val(option);
 				});
 
-				let isOptionSelect = $("#optionNo").val();
+				// 수량 선택 시
+				isOptionSelect = $("#optionNo").val();
 				if(isOptionSelect.length < 1){
 					$("#optionNum").spinner({
 						disabled : true
 					});
 				}
 
+				// 수량 선택 시
 				$("#optionNum").parents("li").click(function(){
-					let isOptionSelect = $("#optionNo").val();
+					isOptionSelect = $("#optionNo").val();
 
+					// 사이즈 선택 안했을 시
 					if(isOptionSelect.length < 0){
 						alert("사이즈를 먼저 선택해주세요.");
 					}
@@ -107,8 +116,8 @@ html
 
 				// 바로구매 버튼 클릭 시
 				$("#productBuyForm").submit(function(e){
-					let optionNo = $("#optionNo").val();
-					let optionNum = $("#optionNum").val();
+					optionNo = $("#optionNo").val();
+					optionNum = $("#optionNum").val();
 
 					if(optionNo == ""){
 						alert("사이즈를 선택해주세요.");

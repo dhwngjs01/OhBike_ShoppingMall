@@ -143,21 +143,27 @@ exports.joinPost = (req, res) => {
 
 // 장바구니 페이지 - /user/basket
 exports.basket = (req, res) => {
+  // 로그인 여부 확인
   user_no = req.session.user_no;
 
+  // 장바구니 상품 개수
   basketListCount =
     "select count(user_no) as basketListCount from basket, options natural join product natural join image where user_no = ?;";
   basketListCountFormat = db.format(basketListCount, user_no);
 
+  // 장바구니 상품 리스트
   basketList =
     "select basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price from basket, options natural join product natural join image where basket.user_no = 2 and basket.option_no = options.option_no order by basket_datetime desc, basket_no desc;";
   basketListFormat = db.format(basketList, user_no);
 
+  // 로그인 상태일 경우
   if (user_no) {
+    // 장바구니 상품 개수와 장바구니 상품 리스트를 가져옴
     db.query(basketListCountFormat + basketListFormat, (err, result) => {
       if (err) {
         console.log(err);
       } else {
+        // 장바구니 상품 개수와 장바구니 상품 리스트를 렌더링
         res.render("basket", {
           basketListCount: result[0][0].basketListCount,
           basketList: result[1],
@@ -165,6 +171,7 @@ exports.basket = (req, res) => {
       }
     });
   } else {
+    // 로그인 상태가 아닐 경우
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
     );
@@ -173,60 +180,48 @@ exports.basket = (req, res) => {
 
 // 장바구니 상품 삭제 - /user/basket
 exports.basketDeletePost = (req, res) => {
-  user_no = req.session.user_no;
-  basket_no_list = JSON.parse(req.body.basket_no_list);
+  user_no = req.session.user_no; // 로그인 여부 확인
+  basket_no_list = JSON.parse(req.body.basket_no_list); // 배열로 받은 상품(장바구니 번호)
 
+  // 로그인 상태일 경우
   if (user_no) {
     sql = "";
 
-    basket_no_list.each((basket_no) => {
+    // 장바구니 상품 삭제 쿼리문 생성 및 실행
+    // 배열로 받은 상품(장바구니 번호)만큼 반복
+    basket_no_list.forEach((basket_no) => {
+      // 쿼리문 생성
       delete_basket_sql =
-        "delete from basket where basket_no = ? and user_no = ?";
+        "delete from basket where basket_no = ? and user_no = ?;";
+
+      // 쿼리문에 값 삽입
       delete_basket_sql_format = db.format(delete_basket_sql, [
         basket_no,
         user_no,
       ]);
+
+      // 쿼리문 조합
+      sql += delete_basket_sql_format;
     });
 
-    // 장바구니 삭제 다중 쿼리 구현해야돼
-    db.query(sql, [basket_no, user_no], (err, result) => {
+    // 쿼리문 실행
+    db.query(sql, (err, result) => {
       if (err) {
         console.log(err);
       } else {
-        // 삭제가 성공하면
-        if (result.affectedRows > 0) {
-          res.send(true);
+        // 영향이 있는 행이 없다면 오류 전송
+        if (result.affectedRows < 1) {
+          res.send({ sqlError: result });
         } else {
-          res.send(false);
+          // 장바구니 상품 삭제 성공
+          res.send("장바구니에 담긴 상품이 삭제되었습니다.");
         }
       }
     });
   } else {
+    // 로그인 상태가 아닐 경우
     res.send("please_login");
   }
-};
-
-// 결제 페이지 - /product/payment
-exports.payment = (req, res) => {
-  console.log(req.body);
-  res.send(req.body);
-
-  /*
-	basketNo = req.body.basketNo;
-
-	if (req.session.user_no) {
-		sql = "select * from basket natural join product natural join image join options using(product_no) where basket_no = ? order by basket_no desc";
-		db.query(sql, basketNo, (err, paymentList) => {
-			if (err) {
-				console.log(err);
-			} else {
-				res.render("productPayment", { paymentList: paymentList });
-			}
-		});
-	} else {
-		res.send('<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>');
-	}
-	*/
 };
 
 // 주문 조회 페이지 - /user/orderInfo
