@@ -174,11 +174,22 @@ exports.basket = (req, res) => {
 // 장바구니 상품 삭제 - /user/basket
 exports.basketDeletePost = (req, res) => {
   user_no = req.session.user_no;
-  basketNo = req.body.basketNo;
+  basket_no_list = JSON.parse(req.body.basket_no_list);
 
   if (user_no) {
-    sql = "delete from basket where basket_no = ?";
-    db.query(sql, basketNo, (err, result) => {
+    sql = "";
+
+    basket_no_list.each((basket_no) => {
+      delete_basket_sql =
+        "delete from basket where basket_no = ? and user_no = ?";
+      delete_basket_sql_format = db.format(delete_basket_sql, [
+        basket_no,
+        user_no,
+      ]);
+    });
+
+    // 장바구니 삭제 다중 쿼리 구현해야돼
+    db.query(sql, [basket_no, user_no], (err, result) => {
       if (err) {
         console.log(err);
       } else {
@@ -190,6 +201,8 @@ exports.basketDeletePost = (req, res) => {
         }
       }
     });
+  } else {
+    res.send("please_login");
   }
 };
 

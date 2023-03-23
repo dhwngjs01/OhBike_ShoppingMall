@@ -91,10 +91,6 @@ exports.payment = (req, res) => {
   optionNo = req.body.optionNo;
   optionNum = req.body.optionNum;
 
-  // 여기 해야 돼
-  // 장바구니에서 구매 버튼 클릭 시 동작하는 바로구매 기능 구현해야 돼
-  console.log(req.body);
-
   // true == 바로구매 버튼 클릭으로 폼을 전송했을 시
   // false == 장바구니 버튼 클릭으로 폼을 전송했을 시
   directPayment = req.body.directPayment;
