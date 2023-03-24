@@ -40,8 +40,8 @@ html
 														i.fas.fa-check-square.checked
 													.checkIcon
 												td
-													img(src="../uploadFiles/#{basket.file_save_name}", alt="#{basket.file_show_name}" style="width:100%;")
-												td #{basket.product_name}
+													img(src="../uploadFiles/#{basket.file_save_name}", alt="#{basket.file_show_name}" style="width:50%;")
+												td.text-left #{basket.product_name}
 												td #{basket.option_name}
 												td #{basket.option_num} 개
 												td #{(basket.product_price * basket.option_num).numberWithCommas()} 원
@@ -236,7 +236,7 @@ html
 			});
 
 			$(".btnAllOrder").click(() => {
-				if(confirm("선택한 상품을 주문하시겠습니까?")){
+				if(confirm("전체 상품을 주문하시겠습니까?")){
 					$("input[name=basketNo]").prop("checked", true);
 				} else {
 					return false;

@@ -34,8 +34,8 @@ html(lang="ko")
 									- each product, i in product_list
 										tr
 											td
-												img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}" style="width:100%;")
-											td #{product.product_name}
+												img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}" style="width:70%;")
+											td.text-left #{product.product_name}
 											td #{product.option_name}
 											td
 												//- input#optionNum(type="text" value="#{payment.selected_option_num}" min="1" max="#{payment.option_max}")

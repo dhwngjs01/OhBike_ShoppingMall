@@ -100,9 +100,6 @@ exports.payment = (req, res) => {
   optionNum = req.body.optionNum; // 옵션 개수들
   basket_no_list =
     req.body.basket_no_list == undefined ? [] : req.body.basket_no_list; // 장바구니 번호들
-
-  console.log(req.body);
-
   // true == 바로구매 버튼 클릭으로 폼을 전송했을 시
   // false == 장바구니 버튼 클릭으로 폼을 전송했을 시
   directPayment = req.body.directPayment; // 바로구매 여부
