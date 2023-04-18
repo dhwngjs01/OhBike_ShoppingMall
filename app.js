@@ -46,9 +46,9 @@
 
   // Controller
   app.use("/", require("./route/controller/mainctr")); // 메인 관련 라우팅
-  app.use("/user/", require("./route/controller/userctr")); // 로그인 관련 라우팅
+  app.use("/user/", require("./route/controller/userctr")); // 회원 관련 라우팅
   app.use("/public/", require("./route/controller/publicctr")); // 공용 관련 라우팅
-  app.use("/admin/", require("./route/controller/adminctr")); // 공용 관련 라우팅
+  app.use("/admin/", require("./route/controller/adminctr")); // 관리자 관련 라우팅
   app.listen(80, () => {
     console.log("Conneted 80 port");
   });
