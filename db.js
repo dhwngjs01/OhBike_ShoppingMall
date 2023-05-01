@@ -1,10 +1,11 @@
 var mysql = require("mysql");
+var dbConfig = require("./config/db-config.json");
 
 var db = mysql.createConnection({
-  host: "localhost", //db주소
-  user: "201844021", //아이디
-  password: "P@ssw0rd", //비밀번호
-  database: "nodejs_ohbike_shoppingmall", //스키마이름
+  host: dbConfig.host, //db주소
+  user: dbConfig.user, //아이디
+  password: dbConfig.password, //비밀번호
+  database: dbConfig.database, //스키마이름
   charset: "utf8", //문자셋
   multipleStatements: true, // 다중쿼리 허용
 });
