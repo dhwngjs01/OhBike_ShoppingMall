@@ -2,18 +2,25 @@ header#header
 	#headerTop
 		.wrap
 			ul#util
-				if(!session.user_no)
+				- if(!session.user_no){
 					li
 						a(href="/user/login") 로그인
 					li
 						a(href="/user/join") 회원가입
-				else
+				- } else {
 					li
 						a(href="/user/logout") 로그아웃
+					li
+						a(href="/user/orderInfo") 주문조회
 					li
 						a(href="/user/basket") 장바구니
 					li
 						a(href="/user/mypage") 마이페이지
+					- if(session.user_lv == 'admin'){
+						li
+							a(href="/admin/dashboard") 관리자페이지
+					- }
+				- }
 	#headerMain
 		.wrap
 			h1#logo

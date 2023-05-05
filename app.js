@@ -6,14 +6,15 @@
   var session = require("express-session");
   var mss = require("express-mysql-session")(session);
   var url = require("url");
+  var dbConfig = require("./config/db-config.json");
 
   // 세션 설정
   var option = {
     host: "localhost",
     port: 3306,
-    user: "201844021",
-    password: "P@ssw0rd",
-    database: "nodejs_ohbike_shoppingmall",
+    user: dbConfig.user,
+    password: dbConfig.password,
+    database: dbConfig.database,
     charset: "utf8",
   };
 

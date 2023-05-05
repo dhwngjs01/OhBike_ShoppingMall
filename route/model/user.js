@@ -66,7 +66,7 @@ exports.loginPost = (req, res) => {
   userPw = req.body.userPw;
 
   sql =
-    "select user_no, user_name, count(*) as rowCount from user where user_id = ? and user_pw = ?";
+    "select user_no, user_name, user_lv, count(*) as rowCount from user where user_id = ? and user_pw = ?";
   db.query(sql, [userId, userPw], (err, result) => {
     if (err) {
       console.log(err);
@@ -75,6 +75,8 @@ exports.loginPost = (req, res) => {
       if (result[0].rowCount) {
         req.session.user_no = result[0].user_no; // 세션에 회원번호 저장
         req.session.user_name = result[0].user_name; // 세션에 회원이름 저장
+        req.session.user_lv = result[0].user_lv; // 세션에 회원레벨 저장
+
         res.send({ user_name: req.session.user_name });
       } else {
         res.send({ loginFailed: true });

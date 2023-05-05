@@ -1,0 +1,36 @@
+#orderDetailDialog
+	table
+		colgroup
+			col(style="width:14%")
+			col(style="width:auto")
+			col(style="width:auto")
+			col(style="width:auto")
+			col(style="width:13%")
+		thead
+			th
+				|상품번호
+				br
+				|(주문번호)
+			th 상품명
+			th
+				|상품금액
+				br
+				|(개수)
+			th 배송비
+			th 주문상태
+		tbody
+			each orderDetail in orderDetailList
+				tr
+					td.text-center(rowspan="2")
+						|#{orderDetail.product_no}
+						br
+						|(#{orderDetail.order_no})
+					td #{orderDetail.product_name}
+					td.text-right(rowspan="2")
+						|#{orderDetail.product_price.numberWithCommas()} 원
+						br
+						|(#{orderDetail.option_num}개)
+					td(rowspan="2").text-right #{(2500).numberWithCommas()} 원
+					td.text-center(rowspan="2") #{orderDetail.order_status}
+				tr
+					td.text-gray.fs-14 #{orderDetail.option_name} / #{orderDetail.product_price.numberWithCommas()} 원

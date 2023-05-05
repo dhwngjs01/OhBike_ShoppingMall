@@ -16,6 +16,20 @@ exports.helmet = (req, res) => {
   });
 };
 
+exports.ridingWear = (req, res) => {
+  category = "라이딩웨어";
+
+  sql =
+    "select distinct product_brand, product_category from product where product_category = ? and product_enable = 1 order by product_brand";
+  db.query(sql, category, (err, brandList) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("productList", { brandList: brandList, category: category });
+    }
+  });
+};
+
 exports.ridingWear = (req, res) => {};
 
 // 상품목록 뿌려주기

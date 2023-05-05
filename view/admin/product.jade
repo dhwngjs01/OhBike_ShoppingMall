@@ -1,0 +1,102 @@
+doctype html
+html
+	head
+		include adminHead.jade
+	body#page-top
+		include adminHeader.jade
+		#wrapper
+			include adminSideBar.jade
+			
+			#content-wrapper
+				.container-fluid
+					// Breadcrumbs
+					ol.breadcrumb
+						li.breadcrumb-item
+							a(href='/admin/dashboard') 관리자 페이지
+						li.breadcrumb-item.active 상품관리
+
+					// DataTables Example
+					.card.mb-3
+						.card-header
+							i.fas.fa-fw.fa-box
+							|  상품목록
+						.card-body
+							.table-responsive
+								table.table.table-bordered(width='100%', cellspacing='0')
+									thead
+										tr
+											th 상품번호
+											th 이미지
+											th 제품명
+											th 분류
+											th 제조사
+											th 판매가
+											th 등록일
+											th 기능
+									tfoot
+										tr
+											th 상품번호
+											th 이미지
+											th 분류
+											th 제품명
+											th 제조사
+											th 판매가
+											th 등록일
+											th 기능
+									tbody
+										each product in productList
+											tr
+												td.text-center(style="vertical-align:middle;") #{product.product_no}
+												td
+													img(src="../uploadFiles/#{product.file_save_name}" style="max-width:150px;")
+												td #{product.product_name}
+												td #{product.product_category}
+												td #{product.product_brand}
+												td.text-right #{product.product_price.numberWithCommas()}
+												td #{product.product_date.format("yyyy년 MM월 dd일 hh시 mm분")}
+												td
+													button.btn.btn-primary(type="button" onclick="location.href='/admin/productModify?product_no=#{product.product_no}'") 수정
+													- if(product.product_enable == 1){
+														button.btn.btn-danger(type="button" onclick="productChangeStatus(this, '#{product.product_no}')") 비활성화
+													- } else {
+														button.btn.btn-success(type="button" onclick="productChangeStatus(this, '#{product.product_no}')") 활성화
+													- }
+												
+										
+						.card-footer.small.text-muted 마지막 상품이 등록된 날짜 : #{lastProductDate.format("yyyy년 MM월 dd일 HH시 mm분")}
+					
+				include adminFooter.jade
+			// /.content-wrapper
+			// /#wrapper
+			// Scroll to Top Button
+			a.scroll-to-top.rounded(href='#page-top')
+				i.fas.fa-angle-up
+			
+		include adminScript.jade
+		script.
+			$(document).ready(function(){
+				$('.table').DataTable();
+
+			});
+
+			function productChangeStatus(self, product_no){
+				$.ajax({
+					type : "POST",
+					url : "/admin/product/delete",
+					data : { product_no : product_no },
+					success : function(res){
+						if(res.changeProductStatus){
+							if($(self).text() == "활성화"){
+								$(self).text("비활성화");
+								$(self).removeClass("btn-success").addClass("btn-danger");
+							} else {
+								$(self).text("활성화");
+								$(self).removeClass("btn-danger").addClass("btn-success");
+							}
+						}
+					},
+					error : function(e){
+						console.log(e);
+					}
+				})
+			}

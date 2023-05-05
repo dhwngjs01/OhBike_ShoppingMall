@@ -1,0 +1,148 @@
+doctype html
+html
+	head
+		include adminHead.jade
+	body#page-top
+		include adminHeader.jade
+		#wrapper
+			include adminSideBar.jade
+			
+			#content-wrapper
+				.container-fluid
+					// Breadcrumbs
+					ol.breadcrumb
+						li.breadcrumb-item
+							a(href='/admin/dashboard') 관리자 페이지
+						li.breadcrumb-item.active 대시보드
+					// Icon Cards
+					.row
+						.col-xl-4.col-sm-4.mb-4
+							.card.text-white.bg-primary.o-hidden.h-100
+								.card-body
+									.card-body-icon
+										i.fas.fa-fw.fa-comments
+									.mr-5 #{readyStatusCount} 건이 배송 준비중 입니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									span.float-left 자세히 보기
+									span.float-right
+										i.fas.fa-angle-right
+						.col-xl-4.col-sm-4.mb-4
+							.card.text-white.bg-success.o-hidden.h-100
+								.card-body
+									.card-body-icon
+										i.fas.fa-fw.fa-shopping-cart
+									.mr-5 #{shippingStatusCount} 건이 배송 중 입니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									span.float-left 자세히 보기
+									span.float-right
+										i.fas.fa-angle-right
+						.col-xl-4.col-sm-4.mb-4
+							.card.text-white.bg-danger.o-hidden.h-100
+								.card-body
+									.card-body-icon
+										i.fas.fa-fw.fa-life-ring
+									.mr-5 #{productLackCount} 개 품목의 재고가 부족합니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									span.float-left 자세히 보기
+									span.float-right
+										i.fas.fa-angle-right
+
+					// DataTables Example
+					.card.mb-3
+						.card-header
+							i.fas.fa-fw.fa-shipping-fast
+							|  주문정보
+						.card-body
+							.table-responsive
+								table.table.table-bordered(width='100%', cellspacing='0')
+									colgroup
+										col(style="width:8%")
+									thead
+										tr
+											th 이미지
+											th 상품
+											th 사이즈
+											th 수량
+											th 가격
+											th 주문자
+											th 배송상태
+											th 주문일자
+									tfoot
+										tr
+											th 이미지
+											th 상품
+											th 사이즈
+											th 수량
+											th 가격
+											th 주문자
+											th 배송상태
+											th 주문일자
+									tbody
+										each order in orderList
+											tr
+												td
+													img(src="../uploadFiles/#{order.file_save_name}" style="width:100%;")
+												td #{order.product_name}
+												td #{order.option_name}
+												td.text-right #{order.option_num.numberWithCommas()}
+												td.text-right #{order.order_totalPrice.numberWithCommas()}
+												td #{order.user_name}
+												td #{order.order_status}
+												td #{order.order_date.format("yyyy-MM-dd HH:mm")}
+										
+						.card-footer.small.text-muted 마지막으로 주문한 날짜 : #{lastOrderDate != "" ? lastOrderDate.format("yyyy년 MM월 dd일 HH시 mm분") : lastOrderDate}
+					
+					// DataTables Example
+					.card.mb-3
+						.card-header
+							i.fas.fa-fw.fa-users
+							|  회원정보
+						.card-body
+							.table-responsive
+								table.table.table-bordered(width='100%', cellspacing='0')
+									thead
+										tr
+											th 회원 번호
+											th 아이디
+											th 이름
+											th 휴대폰 번호
+											th 우편번호
+											th 주소
+											th 상세주소
+											th 가입 날짜
+									tfoot
+										tr
+											th 회원 번호
+											th 아이디
+											th 이름
+											th 휴대폰 번호
+											th 우편번호
+											th 주소
+											th 상세주소
+											th 가입 날짜
+									tbody
+										each user in userList
+											tr
+												td #{user.user_no}
+												td #{user.user_id}
+												td #{user.user_name}
+												td #{user.user_phone}
+												td.text-right #{user.user_zipcode}
+												td #{user.user_address}
+												td #{user.user_detail_address}
+												td #{user.user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
+										
+						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{lastUserDate.format("yyyy년 MM월 dd일 HH시 mm분")}
+
+				include adminFooter.jade
+			// /.content-wrapper
+			// /#wrapper
+			// Scroll to Top Button
+			a.scroll-to-top.rounded(href='#page-top')
+				i.fas.fa-angle-up
+			
+		include adminScript.jade
+		script.
+			$(document).ready(function(){
+				$('.table').DataTable();
+			});
