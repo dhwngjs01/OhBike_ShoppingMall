@@ -54,9 +54,7 @@ html
 							|  주문정보
 						.card-body
 							.table-responsive
-								table.table.table-bordered(width='100%', cellspacing='0')
-									colgroup
-										col(style="width:8%")
+								table.table.table-sm.table-bordered(width='100%', cellspacing='0')
 									thead
 										tr
 											th 이미지
@@ -80,8 +78,8 @@ html
 									tbody
 										each order in orderList
 											tr
-												td
-													img(src="../uploadFiles/#{order.file_save_name}" style="width:100%;")
+												td.text-center
+													img(src="../uploadFiles/#{order.file_save_name}" style="max-width:80px;")
 												td #{order.product_name}
 												td #{order.option_name}
 												td.text-right #{order.option_num.numberWithCommas()}

@@ -1,8 +1,13 @@
 var db = require("../../db");
 
 exports.dashboard = (req, res) => {
-  sql =
-    "select (select count(*) from detail where order_status = '배송준비중') as readyStatusCount, (select count(*) from detail where order_status = '배송중') as shippingStatusCount, (select count(*) from options where option_num = 0) as productLackCount, (select max(order_date) from orders) as lastOrderDate, (select max(user_date) from user) as lastUserDate";
+  sql = `select 
+  (select count(*) from detail where order_status = '배송준비중') as readyStatusCount, 
+  (select count(*) from detail where order_status = '배송중') as shippingStatusCount, 
+  (select count(*) from options where option_num = 0) as productLackCount, 
+  (select max(order_date) from orders) as lastOrderDate, 
+  (select max(user_date) from user) as lastUserDate`;
+
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
@@ -13,8 +18,7 @@ exports.dashboard = (req, res) => {
       lastOrderDate = result[0].lastOrderDate ? result[0].lastOrderDate : "";
       lastUserDate = result[0].lastUserDate;
 
-      sql =
-        orderListSql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
+      sql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
         from orders, detail, options, product, image, user 
         where orders.order_no = detail.order_no and 
         detail.option_no = options.option_no and 
@@ -22,8 +26,9 @@ exports.dashboard = (req, res) => {
         product.product_no = image.product_no and 
         orders.user_no = user.user_no 
         order by order_date desc;`;
-      orderListSqlFormat = db.format(orderListSql);
-      db.query(sql, (err, orderList) => {
+      orderListSqlFormat = db.format(sql);
+
+      db.query(orderListSqlFormat, (err, orderList) => {
         if (err) {
           console.log(err);
         } else {
