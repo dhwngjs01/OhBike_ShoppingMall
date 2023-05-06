@@ -235,7 +235,7 @@ exports.orderInfo = (req, res) => {
   orderListCountFormat = db.format(orderListCount, user_no);
 
   orderListSql =
-    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date from orders, detail, options, product, image where orders.order_no = detail.order_no and detail.option_no = options.option_no and options.product_no = product.product_no and product.product_no = image.product_no and user_no = ? order by order_date desc;";
+    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date, order_status from orders, detail, options, product, image where orders.order_no = detail.order_no and detail.option_no = options.option_no and options.product_no = product.product_no and product.product_no = image.product_no and user_no = ? order by order_date desc;";
   orderListSqlFormat = db.format(orderListSql, user_no);
 
   db.query(orderListCountFormat + orderListSqlFormat, (err, result) => {

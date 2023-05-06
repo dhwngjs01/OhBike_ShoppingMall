@@ -14,7 +14,15 @@ exports.dashboard = (req, res) => {
       lastUserDate = result[0].lastUserDate;
 
       sql =
-        "select * from orders natural join product natural join options natural join image natural join detail natural join user";
+        orderListSql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
+        from orders, detail, options, product, image, user 
+        where orders.order_no = detail.order_no and 
+        detail.option_no = options.option_no and 
+        options.product_no = product.product_no and 
+        product.product_no = image.product_no and 
+        orders.user_no = user.user_no 
+        order by order_date desc;`;
+      orderListSqlFormat = db.format(orderListSql);
       db.query(sql, (err, orderList) => {
         if (err) {
           console.log(err);
@@ -133,13 +141,25 @@ exports.changeProductStatus = (req, res) => {
 };
 
 exports.order = (req, res) => {
-  sql =
-    "select * from detail natural join user natural join product natural join options natural join orders";
-  db.query(sql, (err, orderList) => {
+  orderListSql = `SELECT detail_no, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
+  from orders, detail, options, product, user 
+  where orders.order_no = detail.order_no and 
+  detail.option_no = options.option_no and 
+  options.product_no = product.product_no and 
+  orders.user_no = user.user_no 
+  order by order_date desc;`;
+  orderListSqlFormat = db.format(orderListSql);
+
+  db.query(orderListSqlFormat, (err, orderList) => {
     if (err) {
       console.log(err);
     } else {
-      res.render("order", { orderList: orderList });
+      orderStatusList = ["배송준비중", "배송중", "배송완료", "주문취소"];
+
+      res.render("order", {
+        orderList: orderList,
+        orderStatusList: orderStatusList,
+      });
     }
   });
 };

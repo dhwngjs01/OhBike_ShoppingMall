@@ -281,7 +281,6 @@ exports.paymentFinal = (req, res) => {
   ordersData = {
     user_no: req.session.user_no,
     order_totalPrice: req.body.total_product_price,
-    order_status: "배송준비중",
     order_ship_name: req.body.order_ship_name,
     order_ship_phone: req.body.order_ship_phone,
     order_ship_zipcode: req.body.order_ship_zipcode,
@@ -327,6 +326,7 @@ exports.paymentFinal = (req, res) => {
               option_no: req.body.option_no, // 옵션 번호
               option_num: req.body.option_num, // 옵션 개수
               product_price: req.body.product_price, // 상품 가격
+              order_status: "배송준비중", // 주문 상태
             };
 
             // 주문 상세 테이블에 주문 상세 정보 저장 (주문 번호, 상품 번호, 옵션 번호, 옵션 개수, 상품 가격)
@@ -335,7 +335,7 @@ exports.paymentFinal = (req, res) => {
               detailSql = "";
               for (i = 0; i < payment_size; i++) {
                 detailSql +=
-                  "insert into detail(product_no, order_no, option_no, option_num, product_price) values (" +
+                  "insert into detail(product_no, order_no, option_no, option_num, product_price, order_status) values (" +
                   detailData.product_no[i] +
                   ", " +
                   detailData.order_no +
@@ -345,6 +345,10 @@ exports.paymentFinal = (req, res) => {
                   detailData.option_num[i] +
                   ", " +
                   detailData.product_price[i] +
+                  ", " +
+                  "'" +
+                  detailData.order_status +
+                  "'" +
                   ");";
               }
 

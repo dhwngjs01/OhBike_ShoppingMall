@@ -85,7 +85,7 @@ html
 												td #{order.product_name}
 												td #{order.option_name}
 												td.text-right #{order.option_num.numberWithCommas()}
-												td.text-right #{order.order_totalPrice.numberWithCommas()}
+												td.text-right #{(order.option_num * order.product_price).numberWithCommas()}
 												td #{order.user_name}
 												td #{order.order_status}
 												td #{order.order_date.format("yyyy-MM-dd HH:mm")}

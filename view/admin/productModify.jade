@@ -2,6 +2,10 @@ doctype html
 html
 	head
 		include adminHead.jade
+		style.
+			.ck-editor__editable {
+				min-height: 700px;
+			}
 	body#page-top
 		include adminHeader.jade
 		#wrapper
@@ -17,65 +21,63 @@ html
 
 					// DataTables Example
 					.card.mb-3
-						.card-header
-							i.fas.fa-fw.fa-users
-							|  상품수정
-						.card-body
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2
-										img.img-fluid(src="../uploadFiles/#{product.file_save_name}")
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 미리보기 이미지
-									.col-md-3
-										input.form-control(type="file" name="thumbnail" required)
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 상품 분류
-									.col-md-3
-										select.form-control(name="product_category" required)
-											option(value="헬멧") 헬멧
-											option(value="라이딩웨어") 라이딩웨어
-											option(value="장갑") 장갑
-											option(value="부츠") 부츠
-											option(value="보호구") 보호구
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 상품명
-									.col-md-3
-										input.form-control(type="text" name="product_name" required)
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 제조사
-									.col-md-3
-										input.form-control(type="text" name="product_brand" required)
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 사이즈
-									.col-md-3
-										.row
-											.col-md-12
-												button#btnAddOption.btn.btn-secondary(type="button") 추가등록
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 가격
-									.col-md-3
-										input.form-control(type="number" name="product_price" required)
-									.offset-md-2
-							.form-group
-								.row.justify-content-center.align-items-center
-									.col-md-2.text-right 상품설명
-									.col-md-3
-										textarea.form-control(name="product_price" style="resize:none" rows="5" required)
-									.offset-md-2
-						.card-footer
-							.float-right
+						form(action="/admin/product/modify/#{product.product_no}" method="post" enctype="multipart/form-data" onsubmit="return modifyProduct(this);")
+							.card-header
+								i.fas.fa-fw.fa-users
+								|  상품수정
+							.card-body
+								.form-group
+									.row
+										.col-md-2.mx-auto
+											img.img-fluid(src="../uploadFiles/#{product.file_save_name}")
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 미리보기 이미지
+										.col-md-3
+											input.form-control(type="file" name="thumbnail" required)
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 상품 분류
+										.col-md-3
+											select.form-control(name="product_category" required)
+												option(value="헬멧") 헬멧
+												option(value="라이딩웨어") 라이딩웨어
+												option(value="장갑") 장갑
+												option(value="부츠") 부츠
+												option(value="보호구") 보호구
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 상품명
+										.col-md-3
+											input.form-control(type="text" name="product_name" required)
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 제조사
+										.col-md-3
+											input.form-control(type="text" name="product_brand" required)
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 사이즈
+										.col-md-3
+											.row
+												.col-md-12
+													button#btnAddOption.btn.btn-secondary(type="button") 추가등록
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 가격
+										.col-md-3
+											input.form-control(type="number" name="product_price" required)
+										.offset-md-2
+								.form-group
+									.row
+										.col-md-8.mx-auto
+											textarea#ckeditor.form-control(name="product_contents" style="resize:none" required)
+							.card-footer.text-right
 								button.btn.btn-primary(type="submit") 수정
 								button.btn.btn-secondary(type="button" onclick='location.href="/admin/dashboard"') 취소
 					
@@ -92,17 +94,16 @@ html
 				$('.table').DataTable();
 
 				$("#btnAddOption").click(function(){
-					html = '\
-						<div class="row align-items-center mb-3">\
-							<div class="col-md-3">옵션 이름</div>\
-							<div class="col-md-4">\
-								<input type="text" name="option_name" class="option_name form-control" />\
-							</div>\
-							<div class="col-md-2">수량</div>\
-							<div class="col-md-3">\
-								<input type="number" name="option_max" class="option_max form-control" min="0" />\
-							</div>\
-						</div>';
+					html = `<div class="row align-items-center mb-3">
+							<div class="col-md-3">옵션 이름</div>
+							<div class="col-md-4">
+								<input type="text" name="option_name" class="option_name form-control" />
+							</div>
+							<div class="col-md-2">수량</div>
+							<div class="col-md-3">
+								<input type="number" name="option_max" class="option_max form-control" min="0" />
+							</div>
+						</div>`;
 
 					var addOptionBox = $(this).parents(".col-md-3");
 
@@ -114,7 +115,19 @@ html
 						onlyNumber($(this), e);
 					});
 				});
+
+				ClassicEditor.create($("#ckeditor")[0]).then(editor => {
+					window.editor = editor;
+				}).catch(error => {
+					console.error('There was a problem initializing the editor.', error);
+				})
 			});
+
+			function modifyProduct(form){
+				console.log(form);
+
+				return false;
+			}
 
 			function productChangeStatus(self, product_no){
 				$.ajax({
