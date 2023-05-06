@@ -47,8 +47,8 @@ html
 										each product in productList
 											tr
 												td.text-center(style="vertical-align:middle;") #{product.product_no}
-												td
-													img(src="../uploadFiles/#{product.file_save_name}" style="max-width:150px;")
+												td.text-center
+													img(src="../uploadFiles/#{product.file_save_name}" style="max-width:80px;")
 												td #{product.product_name}
 												td #{product.product_category}
 												td #{product.product_brand}
