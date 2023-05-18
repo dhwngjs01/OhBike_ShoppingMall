@@ -128,5 +128,12 @@ html
 						alert("수량을 1개 이상 선택해주세요.");
 						return false;
 					}
+
+					// 최대 수량 체크
+					maxOptionNum = $("#optionNo").find("option:selected").data("maxnum");
+					if(optionNum > maxOptionNum){
+						alert("최대 구매 수량을 초과하였습니다.");
+						return false;
+					}
 				});
 			});

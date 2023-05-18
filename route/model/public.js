@@ -162,15 +162,13 @@ exports.payment = (req, res) => {
                   product.option_name +
                   ") - " +
                   "주문 가능한 수량 : " +
-                  original_option_num +
+                  product.option_num +
                   "개";
                 move_url = "history.back();";
 
                 res.send(
                   "<script>alert('" + msg + "');" + move_url + "</script>"
                 );
-
-                return;
 
                 // 재고가 충분할 시
               } else {
