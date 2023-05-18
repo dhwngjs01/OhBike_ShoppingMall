@@ -9,5 +9,10 @@ var db = mysql.createConnection({
   charset: "utf8", //문자셋
   multipleStatements: true, // 다중쿼리 허용
 });
+
+setInterval(function () {
+  db.query("select 1+1");
+}, 3600000);
+
 // db.connect(); //접속
 module.exports = db;
