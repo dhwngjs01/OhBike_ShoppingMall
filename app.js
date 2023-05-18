@@ -6,15 +6,15 @@
   var session = require("express-session");
   var mss = require("express-mysql-session")(session);
   var url = require("url");
-  var dbConfig = require("./config/db-config.json");
+  require("dotenv").config();
 
   // 세션 설정
   var option = {
-    host: "localhost",
-    port: 3306,
-    user: dbConfig.user,
-    password: dbConfig.password,
-    database: dbConfig.database,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     charset: "utf8",
   };
 
@@ -51,8 +51,8 @@
   app.use("/user/", require("./route/controller/userctr")); // 회원 관련 라우팅
   app.use("/public/", require("./route/controller/publicctr")); // 공용 관련 라우팅
   app.use("/admin/", require("./route/controller/adminctr")); // 관리자 관련 라우팅
-  app.listen(80, () => {
-    console.log("Conneted 80 port");
+  app.listen(process.env.LISTEN_PORT, () => {
+    console.log(`Conneted ${process.env.LISTEN_PORT} port`);
   });
 }
 
