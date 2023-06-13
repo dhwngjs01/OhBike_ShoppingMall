@@ -33,7 +33,7 @@ html
 											li
 												select#optionNo(name="optionNo[]")
 													option(value="", selected) 사이즈 선택
-													each option, i in optionList
+													each option, i in option_list
 														- if(option.option_num > 0)
 															option(value="#{option.option_no}", data-maxnum="#{option.option_num}") #{option.option_name}
 														- else

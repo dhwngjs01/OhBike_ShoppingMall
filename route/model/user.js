@@ -61,47 +61,45 @@ exports.logout = (req, res) => {
 };
 
 // 로그인 처리 - /user/login
-exports.loginPost = (req, res) => {
-  userId = req.body.userId;
-  userPw = req.body.userPw;
+exports.loginPost = async (req, res) => {
+  const conn = db().getConnection();
+
+  user_id = req.body.userId;
+  user_pw = req.body.userPw;
 
   sql =
     "select user_no, user_name, user_lv, count(*) as rowCount from user where user_id = ? and user_pw = ?";
-  db.query(sql, [userId, userPw], (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send({ sqlError: err });
-    } else {
-      if (result[0].rowCount) {
-        req.session.user_no = result[0].user_no; // 세션에 회원번호 저장
-        req.session.user_name = result[0].user_name; // 세션에 회원이름 저장
-        req.session.user_lv = result[0].user_lv; // 세션에 회원레벨 저장
+  const [user] = await conn.query(sql, [user_id, user_pw]);
 
-        res.send({ user_name: req.session.user_name });
-      } else {
-        res.send({ loginFailed: true });
-      }
-    }
-  });
+  if (user[0].rowCount) {
+    req.session.user_no = user[0].user_no; // 세션에 회원번호 저장
+    req.session.user_name = user[0].user_name; // 세션에 회원이름 저장
+    req.session.user_lv = user[0].user_lv; // 세션에 회원레벨 저장
+
+    res.send({ user_name: req.session.user_name });
+  } else {
+    res.send({ loginFailed: true });
+  }
+
+  conn.release();
 };
 
 // 아이디 중복 확인 처리 - /user/join
-exports.overlapUserId = (req, res) => {
-  userId = req.body.userId;
+exports.overlapUserId = async (req, res) => {
+  const conn = await db().getConnection();
+
+  user_id = req.body.userId;
 
   sql = "select user_id from user where user_id = ?";
-  db.query(sql, userId, (err, result) => {
-    if (err) {
-      console.log(err);
-      res.send(err);
-    } else {
-      if (result[0]) {
-        res.send(true);
-      } else {
-        res.send(false);
-      }
-    }
-  });
+  const [user] = await conn.query(sql, user_id);
+
+  if (user[0]) {
+    res.send(true);
+  } else {
+    res.send(false);
+  }
+
+  conn.release();
 };
 
 // 회원가입 처리 - /user/join
@@ -144,33 +142,34 @@ exports.joinPost = (req, res) => {
 };
 
 // 장바구니 페이지 - /user/basket
-exports.basket = (req, res) => {
+exports.basket = async (req, res) => {
+  const conn = await db().getConnection();
+
   // 로그인 여부 확인
   user_no = req.session.user_no;
 
   // 장바구니 상품 개수
-  basketListCount =
+  sql =
     "select count(user_no) as basketListCount from basket, options natural join product natural join image where user_no = ?;";
-  basketListCountFormat = db.format(basketListCount, user_no);
+  const [basket_list_count] = await conn.query(sql, user_no);
+
+  sql = `SELECT basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price 
+    FROM basket, options
+    NATURAL JOIN product 
+    NATURAL JOIN image 
+    WHERE basket.user_no = ? 
+    AND basket.option_no = options.option_no 
+    ORDER BY basket_datetime desc, basket_no desc;`;
 
   // 장바구니 상품 리스트
-  basketList =
-    "select basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price from basket, options natural join product natural join image where basket.user_no = 2 and basket.option_no = options.option_no order by basket_datetime desc, basket_no desc;";
-  basketListFormat = db.format(basketList, user_no);
+  const [basket_list] = await conn.query(sql, user_no);
 
   // 로그인 상태일 경우
   if (user_no) {
-    // 장바구니 상품 개수와 장바구니 상품 리스트를 가져옴
-    db.query(basketListCountFormat + basketListFormat, (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        // 장바구니 상품 개수와 장바구니 상품 리스트를 렌더링
-        res.render("basket", {
-          basketListCount: result[0][0].basketListCount,
-          basketList: result[1],
-        });
-      }
+    // 장바구니 상품 개수와 장바구니 상품 리스트를 렌더링
+    res.render("basket", {
+      basketListCount: basket_list_count[0].basketListCount,
+      basketList: basket_list,
     });
   } else {
     // 로그인 상태가 아닐 경우
@@ -178,6 +177,8 @@ exports.basket = (req, res) => {
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
     );
   }
+
+  conn.release();
 };
 
 // 장바구니 상품 삭제 - /user/basket

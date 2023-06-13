@@ -1,57 +1,49 @@
 var db = require("../../db");
 
-exports.dashboard = (req, res) => {
+exports.dashboard = async (req, res) => {
+  const conn = await db().getConnection();
+
   sql = `select 
   (select count(*) from detail where order_status = '배송준비중') as readyStatusCount, 
   (select count(*) from detail where order_status = '배송중') as shippingStatusCount, 
   (select count(*) from options where option_num = 0) as productLackCount, 
   (select max(order_date) from orders) as lastOrderDate, 
   (select max(user_date) from user) as lastUserDate`;
+  const [dashboard_card_data] = await conn.query(sql);
 
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      readyStatusCount = result[0].readyStatusCount;
-      shippingStatusCount = result[0].shippingStatusCount;
-      productLackCount = result[0].productLackCount;
-      lastOrderDate = result[0].lastOrderDate ? result[0].lastOrderDate : "";
-      lastUserDate = result[0].lastUserDate;
+  readyStatusCount = dashboard_card_data[0].readyStatusCount;
+  shippingStatusCount = dashboard_card_data[0].shippingStatusCount;
+  productLackCount = dashboard_card_data[0].productLackCount;
+  lastOrderDate = dashboard_card_data[0].lastOrderDate
+    ? dashboard_card_data[0].lastOrderDate
+    : "";
+  lastUserDate = dashboard_card_data[0].lastUserDate;
 
-      sql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
-        from orders, detail, options, product, image, user 
-        where orders.order_no = detail.order_no and 
-        detail.option_no = options.option_no and 
-        options.product_no = product.product_no and 
-        product.product_no = image.product_no and 
-        orders.user_no = user.user_no 
-        order by order_date desc;`;
-      orderListSqlFormat = db.format(sql);
+  sql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
+        FROM orders, detail, options, product, image, user 
+        WHERE orders.order_no = detail.order_no 
+        AND detail.option_no = options.option_no 
+        AND options.product_no = product.product_no 
+        AND product.product_no = image.product_no 
+        AND orders.user_no = user.user_no 
+        ORDER BY order_date DESC;`;
 
-      db.query(orderListSqlFormat, (err, orderList) => {
-        if (err) {
-          console.log(err);
-        } else {
-          sql = "select * from user";
-          db.query(sql, (err, userList) => {
-            if (err) {
-              console.log(err);
-            } else {
-              res.render("dashboard", {
-                readyStatusCount: readyStatusCount,
-                shippingStatusCount: shippingStatusCount,
-                productLackCount: productLackCount,
-                lastOrderDate: lastOrderDate,
-                orderList: orderList,
-                userList: userList,
-                lastUserDate: lastUserDate,
-              });
-            }
-          });
-        }
-      });
-    }
+  const [order_list] = await conn.query(sql);
+
+  sql = `SELECT * FROM user;`;
+  const [user_list] = await conn.query(sql);
+
+  res.render("dashboard", {
+    readyStatusCount: readyStatusCount,
+    shippingStatusCount: shippingStatusCount,
+    productLackCount: productLackCount,
+    lastOrderDate: lastOrderDate,
+    orderList: order_list,
+    userList: user_list,
+    lastUserDate: lastUserDate,
   });
+
+  conn.release();
 };
 
 exports.user = (req, res) => {

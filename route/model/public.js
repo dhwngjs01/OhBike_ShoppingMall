@@ -1,274 +1,215 @@
 var db = require("../../db");
-var user = require("../model/user");
 
-// 상품목록 페이지 - 헬멧
-exports.helmet = (req, res) => {
-  category = "헬멧";
+// 상품목록 페이지
+exports.productListPage = async (req, res) => {
+  const conn = await db().getConnection();
 
-  sql =
-    "select distinct product_brand, product_category from product where product_category = ? and product_enable = 1 order by product_brand";
-  db.query(sql, category, (err, brandList) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("productList", { brandList: brandList, category: category });
-    }
-  });
+  const path = req.path.substring(1);
+
+  let category = "";
+  switch (path) {
+    case "helmet":
+      category = "헬멧";
+      break;
+    case "ridingWear":
+      category = "라이딩웨어";
+      break;
+  }
+
+  sql = `SELECT DISTINCT product_brand, product_category 
+        FROM product 
+        WHERE product_category = ? 
+        AND product_enable = 1 
+        ORDER BY product_brand;`;
+
+  const [brand_list] = await conn.query(sql, category);
+
+  res.render("productList", { brand_list: brand_list, category: category });
 };
-
-exports.ridingWear = (req, res) => {
-  category = "라이딩웨어";
-
-  sql =
-    "select distinct product_brand, product_category from product where product_category = ? and product_enable = 1 order by product_brand";
-  db.query(sql, category, (err, brandList) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("productList", { brandList: brandList, category: category });
-    }
-  });
-};
-
-exports.ridingWear = (req, res) => {};
 
 // 상품목록 뿌려주기
-exports.getProductList = (req, res) => {
+exports.getProductList = async (req, res) => {
+  const conn = await db().getConnection();
+
   let product_category = req.body.category;
-  let product_brand = JSON.parse(req.body.brand);
-  let brandSql = "";
+  let product_brand_array = JSON.parse(req.body.brand);
+  let brand_search_sql = "";
 
-  if (product_brand.length > 0) {
-    brandSql = "and";
+  if (product_brand_array.length > 0) {
+    brand_search_sql = "and";
 
-    product_brand.forEach((brand, key) => {
-      brandSql += " product_brand like '%" + brand + "%' or";
+    product_brand_array.forEach((product_brand, key) => {
+      brand_search_sql += " product_brand like '%" + product_brand + "%' or";
     });
 
-    brandSql = brandSql.substring(0, brandSql.length - 3);
+    brand_search_sql = brand_search_sql.substring(
+      0,
+      brand_search_sql.length - 3
+    );
   }
 
   // 상품 개수 구하기 쿼리문 생성 및 실행
-  sql =
-    "select count(product_no) as productCount from product natural join image where product_category = ? " +
-    brandSql;
-  db.query(sql, product_category, (err, productCount) => {
-    if (err) {
-      console.log(err);
-    } else {
-      // 상품 목록 쿼리문 생성 및 실행
-      sql =
-        "select * from product natural join image where product_category = ? " +
-        brandSql +
-        " order by product_brand";
-      db.query(sql, product_category, (err, productList) => {
-        if (err) {
-          console.log(err);
-          3;
-        } else {
-          // 상품 개수와 상품 목록을 뿌려줌 (ajaxProductList.jade)
-          res.render("ajaxProductList", {
-            productList: productList,
-            productCount: productCount[0].productCount,
-          });
-        }
-      });
-    }
+  sql = `select count(product_no) as product_count from product natural join image where product_category = ? ${brand_search_sql}`;
+  const [product_count] = await conn.query(sql, product_category);
+
+  // 상품 목록 쿼리문 생성 및 실행
+  sql = `select * from product natural join image where product_category = ? ${brand_search_sql} order by product_brand;`;
+  const [product_list] = await conn.query(sql, product_category);
+
+  res.render("ajaxProductList", {
+    product_list: product_list,
+    product_count: product_count[0].product_count,
   });
+
+  conn.release();
 };
 
 // 상품 상세 페이지
-exports.productDetail = (req, res) => {
-  productNo = req.query.productNo;
+exports.productDetail = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_no = req.query.productNo;
 
   // 상품 정보 쿼리문 생성
-  productSql = "select * from product natural join image where product_no = ?;";
-  productSqlFormat = db.format(productSql, productNo);
+  sql = "select * from product natural join image where product_no = ?;";
+  const [product] = await conn.query(sql, product_no);
 
   // 상품 옵션 쿼리문 생성
-  optionSql = "select * from options where product_no = ?;";
-  optionSqlFormat = db.format(optionSql, productNo);
+  sql = "select * from options where product_no = ?;";
+  const [option_list] = await conn.query(sql, product_no);
 
-  // 상품 정보와 상품 옵션을 한번에 가져옴
-  db.query(productSqlFormat + optionSqlFormat, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      product = result[0][0]; // 상품 정보
-      optionList = result[1]; // 상품 옵션
-
-      // 상품 상세 페이지 렌더링 (productDetail.jade)
-      res.render("productDetail", {
-        product: product,
-        optionList: optionList,
-      });
-    }
+  // 상품 상세 페이지 렌더링 (productDetail.jade)
+  res.render("productDetail", {
+    product: product[0],
+    option_list: option_list,
   });
+
+  conn.release();
 };
 
 // 상품 결제 페이지
-exports.payment = (req, res) => {
-  userNo = req.session.user_no; // 로그인한 유저의 번호
-  productNo = req.body.productNo; // 상품 번호들
-  optionNo = req.body.optionNo; // 옵션 번호들
-  optionNum = req.body.optionNum; // 옵션 개수들
-  basket_no_list =
+exports.payment = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const user_no = req.session.user_no; // 로그인한 유저의 번호
+  const product_no = req.body.productNo; // 상품 번호들
+  const option_no_list = req.body.optionNo; // 옵션 번호들
+  const option_num_list = req.body.optionNum; // 옵션 개수들
+  const basket_no_list =
     req.body.basket_no_list == undefined ? [] : req.body.basket_no_list; // 장바구니 번호들
+
   // true == 바로구매 버튼 클릭으로 폼을 전송했을 시
   // false == 장바구니 버튼 클릭으로 폼을 전송했을 시
-  directPayment = req.body.directPayment; // 바로구매 여부
+  const direct_payment = JSON.parse(req.body.directPayment); // 바로구매 여부
+
+  // 상품 개수가 재고 개수보다 많은 수량을 주문시 확인하는 변수
+  let option_num_over = false;
 
   // 상품 보기 페이지에서 바로구매, 장바구니 페이지에서 주문하기(선택한 상품 주문, 전체 주문) 버튼을 클릭했을 시
-  if (directPayment == "true") {
+  if (direct_payment) {
     // 로그인한 유저의 정보를 가져옴
-    user_no_sql = "select * from user where user_no = ?";
-    user_no_sql_format = db.format(user_no_sql, userNo);
-    db.query(user_no_sql_format, (err, user) => {
-      if (err) {
-        console.log(err);
+    sql = "select * from user where user_no = ?";
+    const [user] = await conn.query(sql, user_no);
+
+    // 상품 정보를 가져옴
+    sql = "select * from product natural join options natural join image where";
+
+    // 상품 번호들을 배열로 만들어서 반복문을 돌림
+    option_no_list.forEach((optionNo, key) => {
+      sql += " option_no = ? or"; // 상품 번호를 쿼리문에 추가
+    });
+
+    // 마지막에 붙은 or을 제거
+    sql = sql.substring(0, sql.length - 3);
+
+    // 상품 번호를 쿼리문에 추가
+    const [product_list] = await conn.query(sql, option_no_list);
+
+    product_list.size = product_list.length; // 상품 개수
+    product_list.total_product_price = 0; // 상품 총 가격
+
+    product_list.forEach((product, key) => {
+      // 상품 개수가 재고 개수보다 많은 수량을 주문할 시 뒤로가기
+      if (product.option_num < option_num_list[key]) {
+        option_num_over = true;
+        msg = `재고보다 많은 수량을 주문할 수 없습니다. 
+    
+주문하신 수량보다 재고가 부족한 상품 목록 
+${product.product_name} (옵션 : ${product.option_name}) - 주문 가능한 수량 : ${product.option_num}개`;
       } else {
-        // 상품 정보를 가져옴
-        product_sql =
-          "select * from product natural join options natural join image where";
-
-        // 상품 번호들을 배열로 만들어서 반복문을 돌림
-        optionNo.forEach((optionNo, key) => {
-          product_sql += " option_no = ? or"; // 상품 번호를 쿼리문에 추가
-        });
-
-        // 마지막에 붙은 or을 제거
-        product_sql = product_sql.substring(0, product_sql.length - 3);
-
-        // 상품 번호를 쿼리문에 추가
-        product_sql_format = db.format(product_sql, optionNo);
-
-        // 상품 정보를 가져옴
-        db.query(product_sql_format, (err, product_list) => {
-          if (err) {
-            console.log(err);
-            res.send({ sqlError: err });
-          } else {
-            product_list.size = product_list.length; // 상품 개수
-            product_list.total_product_price = 0; // 상품 총 가격
-
-            product_list.forEach((product, key) => {
-              // 상품 개수가 재고 개수보다 많은 수량을 주문할 시 뒤로가기
-              if (product.option_num < optionNum[key]) {
-                msg =
-                  "재고보다 많은 수량을 주문할 수 없습니다.\\r\\n\\r\\n주문하신 수량보다 재고가 부족한 상품 목록\\r\\n";
-                msg +=
-                  product.product_name +
-                  " (옵션 : " +
-                  product.option_name +
-                  ") - " +
-                  "주문 가능한 수량 : " +
-                  product.option_num +
-                  "개";
-                move_url = "history.back();";
-
-                res.send(
-                  "<script>alert('" + msg + "');" + move_url + "</script>"
-                );
-
-                // 재고가 충분할 시
-              } else {
-                product_list[key].original_option_num = product.option_num; // 재고 개수 변수
-                product_list[key].selected_option_num = optionNum[key]; // 선택한 옵션 개수
-                product_list.total_product_price +=
-                  product.product_price * optionNum[key]; // 상품 총 가격
-              }
-            });
-
-            // 결제 페이지 렌더링 (productPayment.jade)
-            res.render("public/productPayment", {
-              product_list: product_list, // 상품 정보와 옵션 정보
-              basket_no_list: basket_no_list,
-              user: user[0], // 로그인한 유저의 정보
-            });
-          }
-        });
+        // 재고가 충분할 시
+        product_list[key].original_option_num = product.option_num; // 재고 개수 변수
+        product_list[key].selected_option_num = option_num_list[key]; // 선택한 옵션 개수
+        product_list.total_product_price +=
+          product.product_price * option_num_list[key]; // 상품 총 가격
       }
     });
+
+    // 상품 개수가 재고 개수보다 많은 수량을 주문할 시
+    if (option_num_over) {
+      // 뒤로가기
+      res.send(`<script>alert(\`${msg}\`); history.back();</script>`);
+    } else {
+      // 결제 페이지 렌더링 (productPayment.jade)
+      res.render("public/productPayment", {
+        product_list: product_list, // 상품 정보와 옵션 정보
+        basket_no_list: basket_no_list,
+        user: user[0], // 로그인한 유저의 정보
+      });
+    }
+
     // 장바구니 버튼 클릭으로 폼을 전송했을 시
-  } else if (directPayment == "false") {
+  } else {
     // 장바구니에 이미 상품이 존재하는지 확인
-    basketItemCountSql =
+    sql =
       "select basket_no, count(*) as basketItemCount from basket where user_no = ? and option_no = ?";
-    basketItemCountFormat = db.format(basketItemCountSql, [userNo, optionNo]);
+    const [basket] = await conn.query(sql, [user_no, option_no_list]);
+
+    basket_no = basket[0].basket_no; // 장바구니 번호
+    basket_item_count = basket[0].basketItemCount; // 장바구니에 상품 개수
 
     // 장바구니에 상품이 존재할 시
-    db.query(basketItemCountFormat, (err, result) => {
-      if (err) {
-        console.log(err);
+    if (basket_item_count > 0) {
+      // 장바구니에 상품이 존재할 시 옵션 개수를 업데이트
+      sql = "update basket set option_num = option_num + ? where basket_no = ?";
+      const [update_basket_result] = await conn.query(sql, [
+        option_num_list,
+        basket_no,
+      ]);
+
+      // 장바구니 페이지로 리다이렉트
+      if (update_basket_result.affectedRows > 0) {
+        res.redirect("/user/basket");
       } else {
-        basketNo = result[0].basket_no; // 장바구니 번호
-        basketItemCount = result[0].basketItemCount; // 장바구니에 상품 개수
-
-        // 장바구니에 상품이 존재할 시
-        if (basketItemCount > 0) {
-          // 장바구니에 상품이 존재할 시 옵션 개수를 업데이트
-          updateBasketItemOptionNumSql =
-            "update basket set option_num = option_num + ? where user_no = ? and basket_no = ?";
-
-          // 쿼리문 생성
-          updateBasketItemOptionNumSqlFormat = db.format(
-            updateBasketItemOptionNumSql,
-            [optionNum, userNo, basketNo]
-          );
-
-          // 쿼리문 실행
-          db.query(updateBasketItemOptionNumSqlFormat, (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              // 장바구니 페이지로 리다이렉트
-              if (result.affectedRows > 0) {
-                res.redirect("/user/basket");
-              } else {
-                res.send(
-                  '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
-                );
-              }
-            }
-          });
-          // 장바구니에 상품이 존재하지 않을 시
-        } else {
-          // 장바구니에 상품을 추가
-          insertBasketItemSql =
-            "insert into basket(user_no, product_no, option_no, option_num) values(?, ?, ?, ?)";
-
-          // 쿼리문 생성
-          insertBasketItemSqlFormat = db.format(insertBasketItemSql, [
-            userNo,
-            productNo,
-            optionNo,
-            optionNum,
-          ]);
-
-          // 쿼리문 실행
-          db.query(insertBasketItemSqlFormat, (err, result) => {
-            if (err) {
-              console.log(err);
-            } else {
-              // 장바구니 페이지로 리다이렉트
-              if (result.affectedRows > 0) {
-                res.redirect("/user/basket");
-              } else {
-                res.send(
-                  '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
-                );
-              }
-            }
-          });
-        }
+        res.send(
+          '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
+        );
       }
-    });
-  } else {
-    // directPayment가 없는 이상한 접근일 경우
-    res.send(
-      '<script>alert("접근할 수 없는 페이지입니다."); history.back()</script>'
-    );
+    } else {
+      // 장바구니에 상품이 존재하지 않을 시
+      // 장바구니에 상품을 추가
+      sql =
+        "insert into basket(user_no, product_no, option_no, option_num) values(?, ?, ?, ?)";
+
+      [insert_basket_result] = await conn.query(sql, [
+        user_no,
+        product_no,
+        option_no_list,
+        option_num_list,
+      ]);
+
+      // 장바구니 페이지로 리다이렉트
+      if (insert_basket_result.affectedRows > 0) {
+        res.redirect("/user/basket");
+      } else {
+        res.send(
+          '<script>alert("장바구니에 담는데 실패했습니다."); history.back();</script>'
+        );
+      }
+    }
   }
+
+  conn.release();
 };
 
 // 결제 페이지 -> 결제 완료 페이지 (결제 완료 후 장바구니에서 상품 삭제)

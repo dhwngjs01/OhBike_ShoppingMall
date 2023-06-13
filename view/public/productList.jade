@@ -13,7 +13,7 @@ html
 								.title 브랜드
 							.right
 								ul.brandList
-									each brand, i in brandList
+									each brand, i in brand_list
 										li
 											label(for="brand_#{i}") #{brand.product_brand}
 											input(type="checkbox" id="brand_#{i}" name="brand" value="#{brand.product_brand}")

@@ -1,18 +1,22 @@
-var mysql = require("mysql");
+const mysql = require("mysql2/promise");
 require("dotenv").config();
 
-var db = mysql.createConnection({
-  host: process.env.DB_HOST, //db주소
-  user: process.env.DB_USER, //아이디
-  password: process.env.DB_PASSWORD, //비밀번호
-  database: process.env.DB_DATABASE, //스키마이름
-  charset: "utf8", //문자셋
-  multipleStatements: true, // 다중쿼리 허용
-});
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE } = process.env;
 
-setInterval(function () {
-  db.query("select 1+1");
-}, 3600000);
+const db = () => {
+  try {
+    return mysql.createPool({
+      host: DB_HOST, //db주소
+      user: DB_USER, //아이디
+      password: DB_PASSWORD, //비밀번호
+      database: DB_DATABASE, //스키마이름
+      charset: "utf8", //문자셋
+      multipleStatements: true, // 다중쿼리 허용
+      enableKeepAlive: true, //db 연결 유지
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-// db.connect(); //접속
 module.exports = db;
