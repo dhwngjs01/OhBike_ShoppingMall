@@ -46,26 +46,23 @@ exports.dashboard = async (req, res) => {
   conn.release();
 };
 
-exports.user = (req, res) => {
-  sql = "select (select max(user_date) from user) as lastUserDate from user";
-  db.query(sql, (err, lastUserDate) => {
-    if (err) {
-      console.log(err);
-    } else {
-      sql = "select * from user";
-      db.query(sql, (err, userList) => {
-        if (err) {
-          console.log(err);
-        } else {
-          lastUserDate = lastUserDate[0].lastUserDate;
-          res.render("user", {
-            userList: userList,
-            lastUserDate: lastUserDate,
-          });
-        }
-      });
-    }
+exports.user = async (req, res) => {
+  const conn = await db().getConnection();
+
+  sql = `select max(user_date) as last_user_signup_date from user`;
+  var [rows, fields] = await conn.query(sql);
+  const last_user_signup_date = rows[0].last_user_signup_date;
+
+  sql = `select * from user`;
+  var [rows, fields] = await conn.query(sql);
+  const user_list = rows;
+
+  res.render("user", {
+    user_list: user_list,
+    last_user_signup_date: last_user_signup_date,
   });
+
+  conn.release();
 };
 
 exports.product = (req, res) => {

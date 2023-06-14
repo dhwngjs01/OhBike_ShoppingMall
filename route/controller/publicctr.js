@@ -8,7 +8,10 @@ const upload = multer({
 });
 
 // GET MAPPING
-router.get(["/helmet", "/ridingWear"], public.productListPage);
+router.get(
+  ["/helmet", "/ridingWear", "/gloves", "/boots", "/protection"],
+  public.productListPage
+);
 router.get(
   ["/productDetail", "/productDetail?productNo=:productNo"],
   public.productDetail

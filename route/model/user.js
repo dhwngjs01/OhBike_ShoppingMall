@@ -34,23 +34,23 @@ exports.mypage = (req, res) => {
 };
 
 // 회원정보수정 - /user/modify
-exports.modify = (req, res) => {
+exports.modify = async (req, res) => {
+  const conn = await db().getConnection();
+
   user_no = req.session.user_no;
 
   if (user_no) {
-    sql = "select * from user where user_no = ?";
-    db.query(sql, user_no, (err, user) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render("modify", { user: user[0] });
-      }
-    });
+    sql = `SELECT * FROM user WHERE user_no = ?`;
+    const [user] = await conn.query(sql, user_no);
+
+    res.render("modify", { user: user[0] });
   } else {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
     );
   }
+
+  conn.release();
 };
 
 // 로그아웃 /user/logout
@@ -62,7 +62,7 @@ exports.logout = (req, res) => {
 
 // 로그인 처리 - /user/login
 exports.loginPost = async (req, res) => {
-  const conn = db().getConnection();
+  const conn = await db().getConnection();
 
   user_id = req.body.userId;
   user_pw = req.body.userPw;
@@ -228,25 +228,36 @@ exports.basketDeletePost = (req, res) => {
 };
 
 // 주문 조회 페이지 - /user/orderInfo
-exports.orderInfo = (req, res) => {
+exports.orderInfo = async (req, res) => {
+  const conn = await db().getConnection(); // 커넥션 생성
+
   user_no = req.session.user_no;
 
-  orderListCount =
-    "select count(user_no) as orderInfoListCount from orders where user_no = ?;";
-  orderListCountFormat = db.format(orderListCount, user_no);
+  if (user_no) {
+    // 주문 내역 개수
+    sql = `SELECT count(user_no) AS order_list_count FROM orders WHERE user_no = ?;`;
+    const [order_list_count] = await conn.query(sql, user_no);
 
-  orderListSql =
-    "SELECT file_save_name, product_name, option_name, detail.option_num, order_totalPrice, order_status, order_date, order_status from orders, detail, options, product, image where orders.order_no = detail.order_no and detail.option_no = options.option_no and options.product_no = product.product_no and product.product_no = image.product_no and user_no = ? order by order_date desc;";
-  orderListSqlFormat = db.format(orderListSql, user_no);
+    // 주문 내역 리스트
+    sql = `SELECT file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
+      FROM orders, detail, options, product, image 
+      WHERE orders.order_no = detail.order_no 
+      AND detail.option_no = options.option_no 
+      AND options.product_no = product.product_no 
+      AND product.product_no = image.product_no 
+      AND user_no = ? 
+      ORDER BY order_date DESC;`;
+    const [order_list] = await conn.query(sql, user_no);
 
-  db.query(orderListCountFormat + orderListSqlFormat, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("orderInfo", {
-        orderList: result[1],
-        orderInfoListCount: result[0][0].orderInfoListCount,
-      });
-    }
-  });
+    res.render("orderInfo", {
+      order_list: order_list,
+      order_list_count: order_list_count[0].order_list_count,
+    });
+  } else {
+    res.send(
+      '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
+    );
+  }
+
+  conn.release(); // 커넥션 반환
 };

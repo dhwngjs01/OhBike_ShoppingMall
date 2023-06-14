@@ -31,19 +31,25 @@ html
 
 						.right
 							#modify
-								table
-									tr
-										td 이름
-										td #{user.user_name}
-									tr
-										td 아이디
-										td #{user.user_id}
-									tr
-										td 비밀번호
-										td
-											button#changePw(type="button") 비밀번호 변경
-									tr
-										td 휴대전화
+								div(class="min-h-screen bg-gray-100 py-6 flex flex-col justify-center lg:py-12")
+									div(class="relative py-3 lg:max-w-xl lg:mx-auto")
+										div(class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 lg:skew-y-0 lg:-rotate-6 lg:rounded-3xl")
+										div(class="relative px-4 py-10 bg-white shadow-lg lg:rounded-3xl lg:p-20")
+											h1(class="text-center font-bold text-xl mb-5") 회원 정보 수정
+											form(action="/update_user_info", method="POST")
+												div(class="mb-4")
+													label(for="username", class="block text-sm font-medium text-gray-700") 이름
+													input(id="username", name="username", type="text", value="#{user.user_name}" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm")
+												div(class="mb-4")
+													label(for="password", class="block text-sm font-medium text-gray-700") 새 비밀번호
+													input(id="password", name="password", type="password", class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm")
+												div(class="mb-4")
+													label(for="password_confirm", class="block text-sm font-medium text-gray-700") 새 비밀번호 확인
+													input(id="password_confirm", name="password_confirm", type="password", class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm")
+												div(class="mb-4")
+													label(for="phone", class="block text-sm font-medium text-gray-700") 휴대폰 번호
+												div(class="flex justify-center")
+													button(type="submit", class="bg-indigo-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-4") 정보 수정
 
 			include ../footer.jade
 		include ../script.jade

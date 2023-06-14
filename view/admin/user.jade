@@ -44,7 +44,7 @@ html
 											th 상세주소
 											th 가입 날짜
 									tbody
-										each user in userList
+										each user in user_list
 											tr
 												td #{user.user_no}
 												td #{user.user_id}
@@ -55,7 +55,7 @@ html
 												td #{user.user_detail_address}
 												td #{user.user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 										
-						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{lastUserDate.format("yyyy년 MM월 dd일 HH시 mm분")}
+						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{last_user_signup_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 
 				include adminFooter.jade
 			// /.content-wrapper
