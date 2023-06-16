@@ -1,10 +1,10 @@
 doctype html
 html
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap
 					#orderInfo
@@ -34,7 +34,7 @@ html
 									each order, i in order_list
 										tr
 											td
-												img(src="../uploadFiles/#{order.file_save_name}" style="width:50%;")
+												img(src=`../uploadFiles/${order.file_save_name}` style="width:50%;")
 											td.text-left #{order.product_name}
 											td #{order.option_name}
 											td #{order.option_num}
@@ -46,5 +46,5 @@ html
 										td(colspan="8" style="padding:30px 0") 주문한 상품이 없습니다.
 								- }
 
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug

@@ -1,10 +1,10 @@
 doctype html
 html
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap
 					#basket
@@ -34,13 +34,13 @@ html
 									each basket in basketList
 											tr
 												td
-													input(type="checkbox" name="basketNo" id="basketNo#{basket.basket_no}" value="#{basket.basket_no}" data-option-no="#{basket.option_no}" data-option-num="#{basket.option_num}")
-													label(for="basketNo#{basket.basket_no}")
+													input(type="checkbox" name="basketNo" id=`basketNo${basket.basket_no}` value=`${basket.basket_no}` data-option-no=`${basket.option_no}` data-option-num=`${basket.option_num}`)
+													label(for=`basketNo${basket.basket_no}`)
 														i.far.fa-square.notChecked
 														i.fas.fa-check-square.checked
 													.checkIcon
 												td
-													img(src="../uploadFiles/#{basket.file_save_name}", alt="#{basket.file_show_name}" style="width:50%;")
+													img(src=`../uploadFiles/${basket.file_save_name}`, alt=`${basket.file_show_name}` style="width:50%;")
 												td.text-left #{basket.product_name}
 												td #{basket.option_name}
 												td #{basket.option_num} 개
@@ -52,7 +52,7 @@ html
 														| #{(2500 * basket.option_num).numberWithCommas()} 원
 													- }
 												td
-													button.btnOrderProduct(type="button" onclick="basketItemBuy(this)" data-option_no="#{basket.option_no}" data-option_num="#{basket.option_num}") 주문하기
+													button.btnOrderProduct(type="button" onclick="basketItemBuy(this)" data-option_no=`${basket.option_no}` data-option_num=`${basket.option_num}`) 주문하기
 													button.btnDeleteProduct(type="button" data-basket-no="#{basket.basket_no}") 삭제하기
 													form(action="/public/payment" method="post" style="display:none;")
 														input(type="hidden" name="directPayment" value="true")
@@ -79,11 +79,11 @@ html
 								
 						- }
 
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug
 		- if(optionNumError){
 			script.
-				alert("#{optionNumError}");
+				alert(`${optionNumError}`);
 		- }
 		script.
 			// 장바구니 삭제 상품 요소 삭제 함수

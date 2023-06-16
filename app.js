@@ -19,8 +19,8 @@
   };
 
   var sstore = new mss(option);
-  app.locals.pretty = true; // jade를 html태그로 렌더링 할때 이쁘게 변환 시켜줌
-  app.set("view engine", "jade"); // jade 템플릿 엔진으로 설정
+  app.locals.pretty = true; // 페이지 렌더링 할때 코드들 이쁘게 변환 시켜줌
+  app.set("view engine", "pug"); // pug 템플릿 엔진으로 설정
   app.set("views", ["./view/user", "./view/admin", "./view/", "./view/public"]); // front-end 파일의 경로
   app.use(express.static(__dirname + "/resources")); // resources 경로
   app.use("/", express.static(__dirname + "/resources")); // resources 경로

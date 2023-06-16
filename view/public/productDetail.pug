@@ -1,17 +1,17 @@
 doctype html
 html
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap1280
 					#productDetail
 						#productDetailTop
 							.left
 								.image
-									img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}")
+									img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}`)
 							.right
 								.productInfo
 									p.product_brand #{product.product_brand}
@@ -19,7 +19,7 @@ html
 									p.product_en_name #{product.product_en_name}
 								.productBuyArea
 									form#productBuyForm(action="/public/payment", method="post")
-										input(type="hidden" name="productNo[]" value="#{product.product_no}")
+										input(type="hidden" name="productNo[]" value=`${product.product_no}`)
 										ul.productPrice
 											li 판매가격
 											li
@@ -35,7 +35,7 @@ html
 													option(value="", selected) 사이즈 선택
 													each option, i in option_list
 														- if(option.option_num > 0)
-															option(value="#{option.option_no}", data-maxnum="#{option.option_num}") #{option.option_name}
+															option(value=`${option.option_no}`, data-maxnum=`${option.option_num}`) #{option.option_name}
 														- else
 															option(value="", disabled) #{option.option_name} [품절]
 										ul.productNum
@@ -59,8 +59,8 @@ html
 
 
 
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug
 		script.
 
 			$(function(){

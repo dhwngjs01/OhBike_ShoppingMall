@@ -1,15 +1,15 @@
 doctype html
 html
 	head
-		include adminHead.jade
+		include adminHead.pug
 		style.
 			.ck-editor__editable {
 				min-height: 700px;
 			}
 	body#page-top
-		include adminHeader.jade
+		include adminHeader.pug
 		#wrapper
-			include adminSideBar.jade
+			include adminSideBar.pug
 			
 			#content-wrapper
 				.container-fluid
@@ -81,14 +81,14 @@ html
 								button.btn.btn-primary(type="submit") 수정
 								button.btn.btn-secondary(type="button" onclick='location.href="/admin/dashboard"') 취소
 					
-				include adminFooter.jade
+				include adminFooter.pug
 			// /.content-wrapper
 			// /#wrapper
 			// Scroll to Top Button
 			a.scroll-to-top.rounded(href='#page-top')
 				i.fas.fa-angle-up
 			
-		include adminScript.jade
+		include adminScript.pug
 		script.
 			$(document).ready(function(){
 				$('.table').DataTable();

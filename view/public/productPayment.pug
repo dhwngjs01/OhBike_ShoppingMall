@@ -1,10 +1,10 @@
 doctype html
 html(lang="ko")
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap
 					#productPayment
@@ -31,14 +31,14 @@ html(lang="ko")
 									th 최종가격
 							tbody
 								- if(product_list.size > 0){
-									- each product, i in product_list
+									each product, i in product_list
 										tr
 											td
-												img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}" style="width:70%;")
+												img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}` style="width:70%;")
 											td.text-left #{product.product_name}
 											td #{product.option_name}
 											td
-												//- input#optionNum(type="text" value="#{payment.selected_option_num}" min="1" max="#{payment.option_max}")
+												//- input#optionNum(type="text" value=`${payment.selected_option_num}` min="1" max=`${payment.option_max}`)
 												| #{product.selected_option_num} 개
 											td #{product.product_price.numberWithCommas()} 원
 											td
@@ -59,15 +59,15 @@ html(lang="ko")
 								- }
 						
 						form#productPaymentForm(action="/public/payment/final" method="post")
-							input(type="hidden" name="payment_size" value="#{product_list.size}")
-							input(type="hidden" name="total_product_price" value="#{product_list.total_product_price}")
-							- each product, i in product_list
-								input(type="hidden" name="product_no[]" value="#{product.product_no}")
-								input(type="hidden" name="option_no[]" value="#{product.option_no}")
-								input(type="hidden" name="option_num[]" value="#{product.selected_option_num}")
-								input(type="hidden" name="product_price[]" value="#{product.product_price}")
-							- each basket_no, i in basket_no_list
-								input(type="hidden" name="basket_no_list[]" value="#{basket_no}")
+							input(type="hidden" name="payment_size" value=`${product_list.size}`)
+							input(type="hidden" name="total_product_price" value=`${product_list.total_product_price}`)
+							each product, i in product_list
+								input(type="hidden" name="product_no[]" value=`${product.product_no}`)
+								input(type="hidden" name="option_no[]" value=`${product.option_no}`)
+								input(type="hidden" name="option_num[]" value=`${product.selected_option_num}`)
+								input(type="hidden" name="product_price[]" value=`${product.product_price}`)
+							each basket_no, i in basket_no_list
+								input(type="hidden" name="basket_no_list[]" value=`${basket_no}`)
 
 
 							#productPaymentDelivery
@@ -154,8 +154,8 @@ html(lang="ko")
 								button(type="button" onclick="history.back()") 취소
 
 
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug
 		script(src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js")
 		script.
 			//- // 숫자만 입력 가능

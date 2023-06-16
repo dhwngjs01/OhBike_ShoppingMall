@@ -1,10 +1,10 @@
 doctype html
 html
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap
 					#join
@@ -54,8 +54,8 @@ html
 										
 									p.joinBtn
 										button(type="submit" id="joinBtn") 회원가입
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug
 		script(src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js")
 		script.
 			$(() => {

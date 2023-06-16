@@ -1,11 +1,11 @@
 doctype html
 html
 	head
-		include adminHead.jade
+		include adminHead.pug
 	body#page-top
-		include adminHeader.jade
+		include adminHeader.pug
 		#wrapper
-			include adminSideBar.jade
+			include adminSideBar.pug
 			
 			#content-wrapper
 				.container-fluid
@@ -21,8 +21,8 @@ html
 								.card-body
 									.card-body-icon
 										i.fas.fa-fw.fa-comments
-									.mr-5 #{readyStatusCount} 건이 배송 준비중 입니다!
-								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									.mr-5 #{ready_status_count} 건이 배송 준비중 입니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='/admin/order')
 									span.float-left 자세히 보기
 									span.float-right
 										i.fas.fa-angle-right
@@ -31,8 +31,8 @@ html
 								.card-body
 									.card-body-icon
 										i.fas.fa-fw.fa-shopping-cart
-									.mr-5 #{shippingStatusCount} 건이 배송 중 입니다!
-								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									.mr-5 #{shipping_status_count} 건이 배송 중 입니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='/admin/order')
 									span.float-left 자세히 보기
 									span.float-right
 										i.fas.fa-angle-right
@@ -41,8 +41,8 @@ html
 								.card-body
 									.card-body-icon
 										i.fas.fa-fw.fa-life-ring
-									.mr-5 #{productLackCount} 개 품목의 재고가 부족합니다!
-								a.card-footer.text-white.clearfix.small.z-1(href='#')
+									.mr-5 #{product_lack_count} 개 품목의 재고가 부족합니다!
+								a.card-footer.text-white.clearfix.small.z-1(href='/admin/order')
 									span.float-left 자세히 보기
 									span.float-right
 										i.fas.fa-angle-right
@@ -76,7 +76,7 @@ html
 											th 배송상태
 											th 주문일자
 									tbody
-										each order in orderList
+										each order in order_list
 											tr
 												td.text-center
 													img(src="../uploadFiles/#{order.file_save_name}" style="max-width:80px;")
@@ -88,7 +88,7 @@ html
 												td #{order.order_status}
 												td #{order.order_date.format("yyyy-MM-dd HH:mm")}
 										
-						.card-footer.small.text-muted 마지막으로 주문한 날짜 : #{lastOrderDate != "" ? lastOrderDate.format("yyyy년 MM월 dd일 HH시 mm분") : lastOrderDate}
+						.card-footer.small.text-muted 마지막으로 주문한 날짜 : #{last_order_date != "" && last_order_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 					
 					// DataTables Example
 					.card.mb-3
@@ -97,7 +97,7 @@ html
 							|  회원정보
 						.card-body
 							.table-responsive
-								table.table.table-bordered(width='100%', cellspacing='0')
+								table.table.table-sm.table-bordered(width='100%', cellspacing='0')
 									thead
 										tr
 											th 회원 번호
@@ -119,9 +119,9 @@ html
 											th 상세주소
 											th 가입 날짜
 									tbody
-										each user in userList
+										each user in user_list
 											tr
-												td #{user.user_no}
+												td.text-right #{user.user_no}
 												td #{user.user_id}
 												td #{user.user_name}
 												td #{user.user_phone}
@@ -130,17 +130,17 @@ html
 												td #{user.user_detail_address}
 												td #{user.user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 										
-						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{lastUserDate.format("yyyy년 MM월 dd일 HH시 mm분")}
+						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{last_user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 
-				include adminFooter.jade
+				include adminFooter.pug
 			// /.content-wrapper
 			// /#wrapper
 			// Scroll to Top Button
 			a.scroll-to-top.rounded(href='#page-top')
 				i.fas.fa-angle-up
 			
-		include adminScript.jade
+		include adminScript.pug
 		script.
 			$(document).ready(function(){
-				$('.table').DataTable();
+				table = $('.table').DataTable();
 			});

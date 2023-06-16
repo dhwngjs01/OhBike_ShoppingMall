@@ -1,11 +1,11 @@
 doctype html
 html
 	head
-		include adminHead.jade
+		include adminHead.pug
 	body#page-top
-		include adminHeader.jade
+		include adminHeader.pug
 		#wrapper
-			include adminSideBar.jade
+			include adminSideBar.pug
 			
 			#content-wrapper
 				.container-fluid
@@ -22,7 +22,7 @@ html
 							|  회원정보
 						.card-body
 							.table-responsive
-								table.table.table-bordered(width='100%', cellspacing='0')
+								table.table.table-sm.table-bordered(width='100%', cellspacing='0')
 									thead
 										tr
 											th 회원 번호
@@ -57,14 +57,14 @@ html
 										
 						.card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{last_user_signup_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 
-				include adminFooter.jade
+				include adminFooter.pug
 			// /.content-wrapper
 			// /#wrapper
 			// Scroll to Top Button
 			a.scroll-to-top.rounded(href='#page-top')
 				i.fas.fa-angle-up
 			
-		include adminScript.jade
+		include adminScript.pug
 		script.
 			$(document).ready(function(){
 				$('.table').DataTable();

@@ -1,10 +1,10 @@
 doctype html
 html
 	head
-		include ../head.jade
+		include ../head.pug
 	body
 		#wrap
-			include ../header.jade
+			include ../header.pug
 			#contents
 				.wrap
 					#productList
@@ -15,13 +15,13 @@ html
 								ul.brandList
 									each brand, i in brand_list
 										li
-											label(for="brand_#{i}") #{brand.product_brand}
-											input(type="checkbox" id="brand_#{i}" name="brand" value="#{brand.product_brand}")
+											label(for=`brand_${i}`) #{brand.product_brand}
+											input(type="checkbox" id=`brand_${i}` name="brand" value=`${brand.product_brand}`)
 
 				#getProductList
 
-			include ../footer.jade
-		include ../script.jade
+			include ../footer.pug
+		include ../script.pug
 
 		script.
 			let checkedBox = false;
@@ -48,18 +48,19 @@ html
 			});
 			
 			var getProductList = () => {
-				let brand = new Array();
+				var brand = [];
 
 				$("input[type=checkbox]:checked").each((i, input) => {
 					brand.push($(input).val());
 				});
 
+				const category = `#{category}`;
 				brand = JSON.stringify(brand);
 
 				$.ajax({
 					type : "POST",
 					url : "/public/getProductList",
-					data : { category : "#{category}", brand : brand },
+					data : { category, brand },
 					success : (res) => {
 						$("#getProductList").html(res);
 

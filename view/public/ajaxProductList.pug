@@ -15,9 +15,9 @@
 				|<ul class="row">
 			
 			li.col
-				a(href="/public/productDetail?productNo=#{product.product_no}")
+				a(href=`/public/productDetail?productNo=${product.product_no}`)
 					.image
-						img(src="../uploadFiles/#{product.file_save_name}", alt="#{product.file_show_name}")
+						img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}`)
 					p #{product.product_brand}
 					p #{product.product_name}
 					p #{product.product_en_name}

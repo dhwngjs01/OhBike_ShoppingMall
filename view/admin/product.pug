@@ -1,11 +1,11 @@
 doctype html
 html
 	head
-		include adminHead.jade
+		include adminHead.pug
 	body#page-top
-		include adminHeader.jade
+		include adminHeader.pug
 		#wrapper
-			include adminSideBar.jade
+			include adminSideBar.pug
 			
 			#content-wrapper
 				.container-fluid
@@ -22,7 +22,7 @@ html
 							|  상품목록
 						.card-body
 							.table-responsive
-								table.table.table-bordered(width='100%', cellspacing='0')
+								table.table.table-sm.table-bordered.table-hover(width='100%', cellspacing='0')
 									thead
 										tr
 											th 상품번호
@@ -44,9 +44,9 @@ html
 											th 등록일
 											th 기능
 									tbody
-										each product in productList
+										each product in product_list
 											tr
-												td.text-center(style="vertical-align:middle;") #{product.product_no}
+												td.text-center.align-middle #{product.product_no}
 												td.text-center
 													img(src="../uploadFiles/#{product.file_save_name}" style="max-width:80px;")
 												td #{product.product_name}
@@ -55,7 +55,7 @@ html
 												td.text-right #{product.product_price.numberWithCommas()}
 												td #{product.product_date.format("yyyy년 MM월 dd일 hh시 mm분")}
 												td
-													button.btn.btn-primary(type="button" onclick="location.href='/admin/productModify?product_no=#{product.product_no}'") 수정
+													button.btn.btn-primary(type="button" onclick="link('/admin/productModify?product_no=#{product.product_no}')") 수정
 													- if(product.product_enable == 1){
 														button.btn.btn-danger(type="button" onclick="productChangeStatus(this, '#{product.product_no}')") 비활성화
 													- } else {
@@ -63,16 +63,16 @@ html
 													- }
 												
 										
-						.card-footer.small.text-muted 마지막 상품이 등록된 날짜 : #{lastProductDate.format("yyyy년 MM월 dd일 HH시 mm분")}
+						.card-footer.small.text-muted 마지막 상품이 등록된 날짜 : #{last_product_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 					
-				include adminFooter.jade
+				include adminFooter.pug
 			// /.content-wrapper
 			// /#wrapper
 			// Scroll to Top Button
 			a.scroll-to-top.rounded(href='#page-top')
 				i.fas.fa-angle-up
 			
-		include adminScript.jade
+		include adminScript.pug
 		script.
 			$(document).ready(function(){
 				$('.table').DataTable();
@@ -83,9 +83,9 @@ html
 				$.ajax({
 					type : "POST",
 					url : "/admin/product/delete",
-					data : { product_no : product_no },
+					data : { product_no },
 					success : function(res){
-						if(res.changeProductStatus){
+						if(res.success){
 							if($(self).text() == "활성화"){
 								$(self).text("비활성화");
 								$(self).removeClass("btn-success").addClass("btn-danger");
