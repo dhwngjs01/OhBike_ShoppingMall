@@ -28,10 +28,12 @@ exports.dashboard = async (req, res) => {
         AND orders.user_no = user.user_no 
         ORDER BY order_date DESC;`;
 
-  const [order_list] = await conn.query(sql);
+  var [rows] = await conn.query(sql);
+  const order_list = rows;
 
   var sql = `SELECT * FROM user;`;
-  const [user_list] = await conn.query(sql);
+  var [rows] = await conn.query(sql);
+  const user_list = rows;
 
   res.render("dashboard", {
     ready_status_count,
@@ -39,8 +41,8 @@ exports.dashboard = async (req, res) => {
     product_lack_count,
     last_order_date,
     last_user_date,
-    order_list: order_list,
-    user_list: user_list,
+    order_list,
+    user_list,
   });
 
   conn.release();
@@ -49,12 +51,14 @@ exports.dashboard = async (req, res) => {
 exports.user = async (req, res) => {
   const conn = await db().getConnection();
 
-  var sql = `select max(user_date) as last_user_signup_date from user`;
-  var [rows, fields] = await conn.query(sql);
+  var sql = `SELECT max(user_date) AS last_user_signup_date 
+            FROM user`;
+  var [rows] = await conn.query(sql);
   const last_user_signup_date = rows[0].last_user_signup_date;
 
-  var sql = `select * from user`;
-  var [rows, fields] = await conn.query(sql);
+  var sql = `SELECT * 
+            FROM user`;
+  var [rows] = await conn.query(sql);
   const user_list = rows;
 
   res.render("user", { user_list, last_user_signup_date });
@@ -65,11 +69,14 @@ exports.user = async (req, res) => {
 exports.product = async (req, res) => {
   const conn = await db().getConnection();
 
-  var sql = `select max(product_date) as lastProductDate from product`;
+  var sql = `SELECT max(product_date) AS lastProductDate 
+            FROM product`;
   var [rows] = await conn.query(sql);
   const last_product_date = rows[0].lastProductDate;
 
-  var sql = `select * from product natural join image`;
+  var sql = `SELECT * 
+            FROM product 
+            NATURAL JOIN image`;
   var [rows] = await conn.query(sql);
   const product_list = rows;
 
@@ -82,7 +89,7 @@ exports.productAddPage = async (req, res) => {
   res.render("productAdd");
 };
 
-exports.productModify = async (req, res) => {
+exports.productModifyPage = async (req, res) => {
   const conn = await db().getConnection();
 
   const product_no = req.query.product_no;
@@ -93,7 +100,27 @@ exports.productModify = async (req, res) => {
         NATURAL JOIN options 
         WHERE product_no = ?`;
   var [rows] = await conn.query(sql, product_no);
-  const product = rows[0];
+
+  const product = {};
+
+  product.product_no = rows[0].product_no;
+  product.product_name = rows[0].product_name;
+  product.product_en_name = rows[0].product_en_name;
+  product.product_brand = rows[0].product_brand;
+  product.product_category = rows[0].product_category;
+  product.product_contents = rows[0].product_contents;
+  product.product_price = rows[0].product_price;
+  product.file_save_name = rows[0].file_save_name;
+  product.file_show_name = rows[0].file_show_name;
+  product.option_list = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    product.option_list.push({
+      option_no: rows[i].option_no,
+      option_name: rows[i].option_name,
+      option_num: rows[i].option_num,
+    });
+  }
 
   res.render("productModify", { product });
 
@@ -157,4 +184,155 @@ exports.changeOrderStatus = async (req, res) => {
   }
 
   conn.release();
+};
+
+exports.productAdd = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_name = req.body.product_name;
+  const product_en_name = req.body.product_en_name;
+  const product_brand = req.body.product_brand;
+  const product_category = req.body.product_category;
+  const product_contents = req.body.product_contents;
+  const product_price = req.body.product_price;
+
+  const option_name = req.body.option_name;
+  const option_num = req.body.option_num;
+
+  const file = req.files[0];
+  const file_save_name = file && file.filename;
+
+  if (file === undefined) {
+    res.send({ success: false, message: "이미지를 선택해주세요." });
+    return;
+  }
+
+  var sql = `INSERT INTO product (product_name, product_en_name, product_brand, product_category, product_contents, product_price)
+              VALUES (?, ?, ?, ?, ?, ?)`;
+  var [result] = await conn.query(sql, [
+    product_name,
+    product_en_name,
+    product_brand,
+    product_category,
+    product_contents,
+    product_price,
+  ]);
+
+  const product_no = result.insertId; // 상품 등록 후 상품 번호
+
+  // 상품 등록 성공
+  if (result.affectedRows) {
+    var sql = "";
+
+    for (var i = 0; i < option_name.length; i++) {
+      sql += `INSERT INTO options (product_no, option_name, option_num)
+              VALUES (${product_no}, '${option_name[i]}', ${option_num[i]});`;
+    }
+    var [result] = await conn.query(sql);
+
+    // 재고 등록 성공
+    if (result[0].affectedRows) {
+      var sql = `INSERT INTO image (product_no, file_show_name, file_save_name)
+                VALUES (?, ?, ?)`;
+      var [result] = await conn.query(sql, [
+        product_no,
+        product_name,
+        file_save_name,
+      ]);
+
+      // 이미지 등록 성공
+      if (result.affectedRows) {
+        res.send({ success: true, message: "상품이 등록되었습니다." });
+      } else {
+        // 이미지 등록 실패
+        res.send({ success: false, message: "이미지 등록에 실패하였습니다." });
+      }
+    } else {
+      // 재고 등록 실패
+      res.send({ success: false, message: "재고 등록에 실패하였습니다." });
+    }
+  } else {
+    // 상품 등록 실패
+    res.send({ success: false, message: "상품 등록에 실패하였습니다." });
+  }
+
+  conn.release();
+};
+
+exports.productModify = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_no = req.body.product_no;
+  const product_name = req.body.product_name;
+  const product_en_name = req.body.product_en_name;
+  const product_brand = req.body.product_brand;
+  const product_category = req.body.product_category;
+  const product_contents = req.body.product_contents;
+  const product_price = req.body.product_price;
+
+  const option_no = req.body.option_no;
+  const option_name = req.body.option_name;
+  const option_num = req.body.option_num;
+
+  const file = req.files[0];
+  const file_save_name = file && file.filename;
+
+  if (file === undefined) {
+    res.send({ success: false, message: "이미지를 선택해주세요." });
+    return;
+  }
+
+  var sql = `UPDATE product
+            SET product_name = ?, product_en_name = ?, product_brand = ?, product_category = ?, product_contents = ?, product_price = ?
+            WHERE product_no = ?`;
+  var [result] = await conn.query(sql, [
+    product_name,
+    product_en_name,
+    product_brand,
+    product_category,
+    product_contents,
+    product_price,
+    product_no,
+  ]);
+
+  // 상품 수정 성공
+  if (result.affectedRows) {
+    var sql = "";
+
+    for (var i = 0; i < option_no.length; i++) {
+      sql += `UPDATE options
+              SET option_name = ?, option_num = ?
+              WHERE option_no = ?;`;
+    }
+    var [result] = await conn.query(sql, [option_name, option_num, option_no]);
+
+    // 재고 수정 성공
+    if (result.affectedRows) {
+      var sql = `UPDATE image
+                SET file_show_name = ?, file_save_name = ?
+                WHERE product_no = ?`;
+      var [result] = await conn.query(sql, [
+        product_name,
+        file_save_name,
+        product_no,
+      ]);
+
+      // 이미지 수정 성공
+      if (result.affectedRows) {
+        res.send({ success: true, message: "상품이 수정되었습니다." });
+      } else {
+        // 이미지 수정 실패
+        res.send({ success: false, message: "이미지 수정에 실패하였습니다." });
+      }
+    } else {
+      // 재고 수정 실패
+      res.send({ success: false, message: "재고 수정에 실패하였습니다." });
+    }
+  }
+
+  conn.release();
+};
+
+exports.productImage = async (req, res) => {
+  res.send({ url: "/ckeditor_upload/" + req.files[0].filename });
 };

@@ -4,7 +4,14 @@ html
 		include adminHead.pug
 		style.
 			.ck-editor__editable {
-				min-height: 700px;
+				height: 850px;
+				overflow:hidden;
+			}
+
+			#optionListGroup {
+				height:200px;
+				overflow:hidden;
+				overflow-y:scroll;
 			}
 	body#page-top
 		include adminHeader.pug
@@ -21,60 +28,61 @@ html
 
 					// DataTables Example
 					.card.mb-3
-						form(action='/admin/product' method="post" enctype="multipart/form-data" onsubmit="return formSubmit(this);")
+						form#productAddForm(action='/admin/product' method="post" enctype="multipart/form-data")
 							.card-header
 								i.fas.fa-fw.fa-dolly
 								|  상품등록
 							.card-body
 								.row.justify-content-center
-									.col-lg-6
+									.col-lg-3
+										.form-group
+											.card
+												.card-title.text-center.border-bottom.mx-3.py-3.mb-0.text-muted
+													span 상품 미리보기 이미지
+												.card-body.text-center
+													img#previewImage.img-fluid(src="/images/empty_box.png" style="max-height:200px;")
+													input#productImage.d-none(type="file" name="product_image")
+												.card-body
+													button.btn.btn-primary.btn-block.btn-sm(type="button" onclick="$('#productImage').click();") 이미지 선택
 										.row
 											.col-lg-6
-												.card.h-100
-													.card-title.text-center.border-bottom.mx-3.py-3
-														span 미리보기 이미지
-													.card-body
-														img#previewImage(src="/images/no-image.png" style="width:100%; height:100%;")
-														input.d-none(type="file" name="thumbnail" required)
+												.form-group
+													label(for="productCategory") 분류
+													select#productCategory.form-control(name="product_category" required)
+														option(value="") 선택
+														option(value="헬멧") 헬멧
+														option(value="라이딩웨어") 라이딩웨어
+														option(value="장갑") 장갑
+														option(value="부츠") 부츠
+														option(value="보호구") 보호구
 											.col-lg-6
 												.form-group
-														label(for="productCategory") 분류
-														select#productCategory.form-control(name="product_category" required)
-															option(value="헬멧") 헬멧
-															option(value="라이딩웨어") 라이딩웨어
-															option(value="장갑") 장갑
-															option(value="부츠") 부츠
-															option(value="보호구") 보호구
+													label(for="productBrand") 제조사
+													input#productBrand.form-control(type="text" name="product_brand" required)
+											.col-lg-6
 												.form-group
-														label(for="productName") 상품명
-														input#productName.form-control(type="text" name="product_name" required)
+													label(for="productName") 상품명(한글)
+													input#productName.form-control(type="text" name="product_name" required)
+											.col-lg-6
 												.form-group
-														label(for="productBrand") 제조사
-														input#productBrand.form-control(type="text" name="product_brand" required)
-												
-													
-								
-								.form-group
-									.row.justify-content-center.align-items-center
-										.col-md-2.text-right 사이즈
-										.col-md-3
-											.row
-												.col-md-12
-													button#btnAddOption.btn.btn-secondary(type="button") 추가등록
-										.offset-md-2
-								.form-group
-									.row.justify-content-center.align-items-center
-										.col-md-2.text-right 가격
-										.col-md-3
-											input.form-control(type="number" name="product_price" required)
-										.offset-md-2
-								.form-group
-									.row
-										.col-md-8.mx-auto
-											textarea#ckeditor.form-control(name="product_contents" style="resize:none" required)
+													label(for="productEnName") 상품명(영어)
+													input#productEnName.form-control(type="text" name="product_en_name" required)
+											.col-lg-12
+												.form-group 
+													label(for="productPrice") 가격
+													input#productPrice.form-control.text-right(type="number" name="product_price" min="0" required)
+										.form-group
+											label(for="btnAddOption")
+												span 사이즈
+												span.text-muted (옵션)
+											button#btnAddOption.btn.btn-secondary.btn-sm.float-right(type="button") 추가
+										.form-group
+											ul#optionListGroup.list-group.border.p-2
+									.col-lg-7
+										textarea#ckeditor.form-control.d-none(name="product_contents")
 							.card-footer.text-right
-								button.btn.btn-primary(type="submit") 수정
-								button.btn.btn-secondary(type="button" onclick='location.href="/admin/dashboard"') 취소
+								button.btn.btn-primary(type="submit") 등록
+								button.btn.btn-secondary(type="button" onclick='link("/admin/product")') 취소
 					
 				include adminFooter.pug
 			// /.content-wrapper
@@ -84,64 +92,132 @@ html
 				i.fas.fa-angle-up
 			
 		include adminScript.pug
+		script(src="/dashboard/js/UploadAdapter.js")
 		script.
 			$(document).ready(function(){
 				$('.table').DataTable();
 
 				$("#btnAddOption").click(function(){
-					html = `<div class="row align-items-center mb-3">
-							<div class="col-md-3">옵션 이름</div>
-							<div class="col-md-4">
-								<input type="text" name="option_name" class="option_name form-control" />
+					html = `
+						<li class="list-group-item">
+							<div class="row">
+								<div class="col-lg-6">
+									<label>옵션 이름</label>
+									<input type="text" name="option_name" class="option_name form-control form-control-sm" />
+								</div>
+								<div class="col-lg-6">
+									<label>수량</label>
+									<input type="number" name="option_num" class="option_num form-control form-control-sm" min="0" />
+								</div>
 							</div>
-							<div class="col-md-2">수량</div>
-							<div class="col-md-3">
-								<input type="number" name="option_max" class="option_max form-control" min="0" />
-							</div>
-						</div>`;
+						</li>
+					`
 
-					var addOptionBox = $(this).parents(".col-md-3");
+					var option_list_group = $("#optionListGroup");
 
-					$(addOptionBox).prepend(html);
+					$(option_list_group).append(html);
 
-					$(".option_max").keyup(function(e){
+					$(".option_num").keyup(function(e){
 						onlyNumber($(this), e);
 					}).keydown(function(e){
 						onlyNumber($(this), e);
 					});
 				});
 
-				ClassicEditor.create($("#ckeditor")[0]).then(editor => {
+				ClassicEditor.create(document.getElementById("ckeditor"), {
+					extraPlugins: [ MyCustomUploadAdapterPlugin ],
+				}).then(editor => {
 					window.editor = editor;
 				}).catch(error => {
 					console.error('There was a problem initializing the editor.', error);
 				})
 			});
 
-			function formSubmit(form){
-				console.log(form);
+			$("#productImage").change(function(){
+				readURL(this);
+			});
 
-				return false;
-			}
+			$("#productAddForm").submit((e) => {
+				e.preventDefault();
 
-			function productChangeStatus(self, product_no){
+				var option_name = $(".option_name");
+				var option_num = $(".option_num");
+
+				var option_name_array = [];
+				var option_num_array = [];
+
+				for(var i = 0; i < option_name.length; i++){
+					option_name_array.push($(option_name[i]).val());
+					option_num_array.push($(option_num[i]).val());
+				}
+
+				var product_category = $("#productCategory").val();
+				var product_brand = $("#productBrand").val();
+				var product_name = $("#productName").val();
+				var product_en_name = $("#productEnName").val();
+				var product_price = $("#productPrice").val();
+				var product_contents = editor.getData();
+				var product_image = $("#productImage")[0].files[0];
+
+				if(product_image === undefined){
+					alert("상품 이미지를 선택해주세요.");
+					return false;	
+				}
+
+				if(product_contents === ""){
+					alert("상품 설명을 입력해주세요.");
+					return false;
+				}
+
+				var formData = new FormData();
+				formData.append("product_category", product_category);
+				formData.append("product_brand", product_brand);
+				formData.append("product_name", product_name);
+				formData.append("product_en_name", product_en_name);
+				formData.append("product_price", product_price);
+				formData.append("product_contents", product_contents);
+				formData.append("product_image", product_image);
+
+
+				for(var i = 0; i < option_name_array.length; i++){
+					formData.append("option_name", option_name_array[i]);
+					formData.append("option_num", option_num_array[i]);
+				}
+
 				$.ajax({
 					type : "POST",
-					url : "/admin/product/delete",
-					data : { product_no : product_no },
+					url : "/admin/productAdd",
+					data : formData,
+					processData : false,
+					contentType : false,
 					success : function(res){
-						if(res.changeProductStatus){
-							if($(self).text() == "활성화"){
-								$(self).text("비활성화");
-								$(self).removeClass("btn-success").addClass("btn-danger");
-							} else {
-								$(self).text("활성화");
-								$(self).removeClass("btn-danger").addClass("btn-success");
-							}
+						if(res.message)
+							alert(res.message);
+
+						if(res.success){
+							link("/admin/product");
 						}
 					},
 					error : function(e){
 						console.log(e);
 					}
-				})
+				});
+			});
+
+			function MyCustomUploadAdapterPlugin(editor) {
+					editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+							return new UploadAdapter (loader)
+					}
+			}
+
+			function readURL(input){
+				if(input.files && input.files[0]){
+					var reader = new FileReader();
+
+					reader.onload = function(e){
+						$("#previewImage").attr("src", e.target.result);
+					}
+
+					reader.readAsDataURL(input.files[0]);
+				}
 			}

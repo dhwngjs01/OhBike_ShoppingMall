@@ -14,6 +14,17 @@ exports.productListPage = async (req, res) => {
     case "ridingWear":
       category = "라이딩웨어";
       break;
+    case "gloves":
+      category = "장갑";
+      break;
+    case "boots":
+      category = "부츠";
+      break;
+    case "protection":
+      category = "보호구";
+      break;
+    default:
+      break;
   }
 
   sql = `SELECT DISTINCT product_brand, product_category 
