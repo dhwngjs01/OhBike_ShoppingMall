@@ -6,6 +6,7 @@ const multer = require("multer");
 router.get("/dashboard", admin.dashboard); // 메인 페이지
 router.get("/user", admin.user); // 회원목록
 router.get("/product", admin.product); // 상품관리
+router.get("/productAdd", admin.productAddPage); // 상품추가 페이지
 router.get(
   ["/productModify", "/productModify?product_no=:product_no"],
   admin.productModify

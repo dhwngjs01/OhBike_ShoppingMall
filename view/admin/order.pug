@@ -53,12 +53,12 @@ html
 												td.text-right.align-middle #{order.product_price.numberWithCommas()}
 												td.align-middle #{order.user_name}
 												td
-													select.select-order-status.form-control-sm(name="order_status" data-detail_no="#{order.detail_no}")
+													select.select-order-status.form-control.form-control-sm(name="order_status" data-detail_no=`${order.detail_no}`)
 														each status in order_status_list
 															if status == order.order_status
-																option(value="#{status}" selected) #{status}
+																option(value=`${status}` selected) #{status}
 															else
-																option(value="#{status}") #{status}
+																option(value=`${status}`) #{status}
 												td.align-middle #{order.order_date.format("yyyy년 MM월 dd일 HH시 mm분 ss초")}
 					
 				include adminFooter.pug
@@ -70,7 +70,7 @@ html
 			
 		include adminScript.pug
 		script.
-			$(document).ready(function(){
+			$(document).ready(() => {
 				const table = $('.table').DataTable();
 
 				$(".select-order-status").change(function(){

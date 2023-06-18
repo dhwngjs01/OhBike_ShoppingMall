@@ -19,7 +19,7 @@ html
 									p.product_en_name #{product.product_en_name}
 								.productBuyArea
 									form#productBuyForm(action="/public/payment", method="post")
-										input(type="hidden" name="productNo[]" value=`${product.product_no}`)
+										input(type="hidden" name="product_no[]" value=`${product.product_no}`)
 										ul.productPrice
 											li 판매가격
 											li
@@ -31,23 +31,23 @@ html
 										ul.productOption
 											li 사이즈
 											li
-												select#optionNo(name="optionNo[]")
+												select#optionNo(name="option_no[]")
 													option(value="", selected) 사이즈 선택
 													each option, i in option_list
 														- if(option.option_num > 0)
-															option(value=`${option.option_no}`, data-maxnum=`${option.option_num}`) #{option.option_name}
+															option(value=`${option.option_no}`, data-max_num=`${option.option_num}`) #{option.option_name}
 														- else
 															option(value="", disabled) #{option.option_name} [품절]
 										ul.productNum
 											li 수량
 											li
-												input(type="text", name="optionNum[]", id="optionNum", value="0", min="0")
+												input(type="text", name="option_num[]", id="optionNum", value="0", min="0")
 										ul.productBuyBtns
 											- if(session.user_no){
 												li
-													button(type="submit", id="productBuy" name="directPayment" value="true") 바로구매
+													button(type="submit", id="productBuy" name="direct_payment" value="true") 바로구매
 												li
-													button(type="submit", id="addBasket" name="directPayment" value="false") 장바구니
+													button(type="submit", id="addBasket" name="direct_payment" value="false") 장바구니
 											- } else {
 												li
 													button(type="button", id="productBuy" onclick="alert('로그인 후 이용할 수 있는 서비스입니다.'); link('/user/login')") 바로구매
@@ -77,12 +77,12 @@ html
 				// 사이즈 선택 시
 				$("#optionNo").change(function(){
 					option = $(this).val();
-					maxNum = $(this).find("option:selected").data("maxnum");
+					max_num = $(this).find("option:selected").data("max_num");
 
 					if(option.length > 0){
 						$("#optionNum").spinner({
 							disabled : false,
-							max : maxNum,
+							max : max_num,
 							min : 1
 						}).val(1);
 					} else {
@@ -97,8 +97,8 @@ html
 				});
 
 				// 수량 선택 시
-				isOptionSelect = $("#optionNo").val();
-				if(isOptionSelect.length < 1){
+				is_option_select = $("#optionNo").val();
+				if(is_option_select.length < 1){
 					$("#optionNum").spinner({
 						disabled : true
 					});
@@ -106,32 +106,32 @@ html
 
 				// 수량 선택 시
 				$("#optionNum").parents("li").click(function(){
-					isOptionSelect = $("#optionNo").val();
+					is_option_select = $("#optionNo").val();
 
 					// 사이즈 선택 안했을 시
-					if(isOptionSelect.length < 0){
+					if(is_option_select.length < 0){
 						alert("사이즈를 먼저 선택해주세요.");
 					}
 				});
 
 				// 바로구매 버튼 클릭 시
 				$("#productBuyForm").submit(function(e){
-					optionNo = $("#optionNo").val();
-					optionNum = $("#optionNum").val();
+					option_no = $("#optionNo").val();
+					option_num = $("#optionNum").val();
+					max_option_num = $("#optionNo").find("option:selected").data("max_num");
 
-					if(optionNo == ""){
+					if(option_no == ""){
 						alert("사이즈를 선택해주세요.");
 						return false;
 					}
 
-					if(optionNum < 1){
+					if(option_num < 1){
 						alert("수량을 1개 이상 선택해주세요.");
 						return false;
 					}
 
 					// 최대 수량 체크
-					maxOptionNum = $("#optionNo").find("option:selected").data("maxnum");
-					if(optionNum > maxOptionNum){
+					if(option_num > max_option_num){
 						alert("최대 구매 수량을 초과하였습니다.");
 						return false;
 					}

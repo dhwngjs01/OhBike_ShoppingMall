@@ -3,23 +3,23 @@ var db = require("../../db");
 exports.dashboard = async (req, res) => {
   const conn = await db().getConnection();
 
-  sql = `select 
-  (select count(*) from detail where order_status = '배송준비중') as readyStatusCount, 
-  (select count(*) from detail where order_status = '배송중') as shippingStatusCount, 
-  (select count(*) from options where option_num = 0) as productLackCount, 
-  (select max(order_date) from orders) as lastOrderDate, 
-  (select max(user_date) from user) as lastUserDate`;
+  var sql = `select 
+  (select count(*) from detail where order_status = '배송준비중') as ready_status_count, 
+  (select count(*) from detail where order_status = '배송중') as shipping_status_count, 
+  (select count(*) from options where option_num = 0) as product_lack_count, 
+  (select max(order_date) from orders) as last_order_date, 
+  (select max(user_date) from user) as last_user_date`;
   const [dashboard_card_data] = await conn.query(sql);
 
-  readyStatusCount = dashboard_card_data[0].readyStatusCount;
-  shippingStatusCount = dashboard_card_data[0].shippingStatusCount;
-  productLackCount = dashboard_card_data[0].productLackCount;
-  lastOrderDate = dashboard_card_data[0].lastOrderDate
-    ? dashboard_card_data[0].lastOrderDate
+  const ready_status_count = dashboard_card_data[0].ready_status_count;
+  const shipping_status_count = dashboard_card_data[0].shipping_status_count;
+  const product_lack_count = dashboard_card_data[0].product_lack_count;
+  const last_order_date = dashboard_card_data[0].last_order_date
+    ? dashboard_card_data[0].last_order_date
     : "";
-  lastUserDate = dashboard_card_data[0].lastUserDate;
+  const last_user_date = dashboard_card_data[0].last_user_date;
 
-  sql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
+  var sql = `SELECT file_save_name, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
         FROM orders, detail, options, product, image, user 
         WHERE orders.order_no = detail.order_no 
         AND detail.option_no = options.option_no 
@@ -30,17 +30,17 @@ exports.dashboard = async (req, res) => {
 
   const [order_list] = await conn.query(sql);
 
-  sql = `SELECT * FROM user;`;
+  var sql = `SELECT * FROM user;`;
   const [user_list] = await conn.query(sql);
 
   res.render("dashboard", {
-    readyStatusCount: readyStatusCount,
-    shippingStatusCount: shippingStatusCount,
-    productLackCount: productLackCount,
-    lastOrderDate: lastOrderDate,
-    orderList: order_list,
-    userList: user_list,
-    lastUserDate: lastUserDate,
+    ready_status_count,
+    shipping_status_count,
+    product_lack_count,
+    last_order_date,
+    last_user_date,
+    order_list: order_list,
+    user_list: user_list,
   });
 
   conn.release();
@@ -49,127 +49,112 @@ exports.dashboard = async (req, res) => {
 exports.user = async (req, res) => {
   const conn = await db().getConnection();
 
-  sql = `select max(user_date) as last_user_signup_date from user`;
+  var sql = `select max(user_date) as last_user_signup_date from user`;
   var [rows, fields] = await conn.query(sql);
   const last_user_signup_date = rows[0].last_user_signup_date;
 
-  sql = `select * from user`;
+  var sql = `select * from user`;
   var [rows, fields] = await conn.query(sql);
   const user_list = rows;
 
-  res.render("user", {
-    user_list: user_list,
-    last_user_signup_date: last_user_signup_date,
-  });
+  res.render("user", { user_list, last_user_signup_date });
 
   conn.release();
 };
 
-exports.product = (req, res) => {
-  sql = "select max(product_date) as lastProductDate from product";
-  db.query(sql, (err, lastProductDate) => {
-    if (err) {
-      console.log(err);
-    } else {
-      sql = "select * from product natural join image";
-      db.query(sql, (err, productList) => {
-        if (err) {
-          console.log(err);
-        } else {
-          lastProductDate = lastProductDate[0].lastProductDate;
+exports.product = async (req, res) => {
+  const conn = await db().getConnection();
 
-          res.render("product", {
-            productList: productList,
-            lastProductDate: lastProductDate,
-          });
-        }
-      });
-    }
-  });
+  var sql = `select max(product_date) as lastProductDate from product`;
+  var [rows] = await conn.query(sql);
+  const last_product_date = rows[0].lastProductDate;
+
+  var sql = `select * from product natural join image`;
+  var [rows] = await conn.query(sql);
+  const product_list = rows;
+
+  res.render("product", { product_list, last_product_date });
+
+  conn.release();
 };
 
-exports.productModify = (req, res) => {
-  product_no = req.query.product_no;
-
-  sql =
-    "select * from product natural join image natural join options where product_no = ?";
-  db.query(sql, product_no, (err, product) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.render("productModify", { product: product[0] });
-    }
-  });
+exports.productAddPage = async (req, res) => {
+  res.render("productAdd");
 };
 
-exports.changeProductStatus = (req, res) => {
-  product_no = req.body.product_no;
+exports.productModify = async (req, res) => {
+  const conn = await db().getConnection();
 
-  sql = "select product_enable from product where product_no = ?";
-  db.query(sql, product_no, (err, productStatus) => {
-    if (err) {
-      console.log(err);
-    } else {
-      productStatus = productStatus[0].product_enable;
+  const product_no = req.query.product_no;
 
-      if (productStatus == 1) {
-        changeProductStatus = 0;
-      } else {
-        changeProductStatus = 1;
-      }
+  const sql = `SELECT * 
+        FROM product 
+        NATURAL JOIN image 
+        NATURAL JOIN options 
+        WHERE product_no = ?`;
+  var [rows] = await conn.query(sql, product_no);
+  const product = rows[0];
 
-      sql = "update product set product_enable = ? where product_no = ?";
-      db.query(sql, [changeProductStatus, product_no], (err, result) => {
-        if (err) {
-          console.log(err);
-        } else {
-          if (result.affectedRows) {
-            res.send({ changeProductStatus: true });
-          } else {
-            res.send({ notAffectedRows: true });
-          }
-        }
-      });
-    }
-  });
+  res.render("productModify", { product });
+
+  conn.release();
 };
 
-exports.order = (req, res) => {
-  orderListSql = `SELECT detail_no, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date 
-  from orders, detail, options, product, user 
-  where orders.order_no = detail.order_no and 
-  detail.option_no = options.option_no and 
-  options.product_no = product.product_no and 
-  orders.user_no = user.user_no 
-  order by order_date desc;`;
-  orderListSqlFormat = db.format(orderListSql);
+exports.changeProductStatus = async (req, res) => {
+  const conn = await db().getConnection();
 
-  db.query(orderListSqlFormat, (err, orderList) => {
-    if (err) {
-      console.log(err);
-    } else {
-      orderStatusList = ["배송준비중", "배송중", "배송완료", "주문취소"];
+  const product_no = req.body.product_no;
 
-      res.render("order", {
-        orderList: orderList,
-        orderStatusList: orderStatusList,
-      });
-    }
-  });
+  var sql = `UPDATE product 
+            SET product_enable = not product_enable
+            WHERE product_no = ?`;
+  var [result] = await conn.query(sql, [product_no]);
+
+  if (result.affectedRows) {
+    res.send({ success: true });
+  } else {
+    res.send({ success: false });
+  }
+
+  conn.release();
 };
 
-exports.changeOrderStatus = (req, res) => {
-  order_status = req.body.order_status;
-  detail_no = req.body.detail_no;
+exports.order = async (req, res) => {
+  const conn = await db().getConnection();
 
-  sql = "update detail set order_status = ? where detail_no = ?";
-  db.query(sql, [order_status, detail_no], (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      if (result.affectedRows) {
-        res.send({ orderStatusChanged: true });
-      }
-    }
-  });
+  var sql = `SELECT detail_no, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date
+            FROM orders, detail, options, product, user
+            WHERE orders.order_no = detail.order_no
+            AND detail.option_no = options.option_no
+            AND options.product_no = product.product_no
+            AND orders.user_no = user.user_no
+            ORDER BY order_date DESC;`;
+  var [rows] = await conn.query(sql);
+  const order_list = rows;
+
+  order_status_list = ["배송준비중", "배송중", "배송완료", "주문취소"];
+
+  res.render("order", { order_list, order_status_list });
+
+  conn.release();
+};
+
+exports.changeOrderStatus = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const order_status = req.body.order_status;
+  const detail_no = req.body.detail_no;
+
+  var sql = `UPDATE detail 
+            SET order_status = ? 
+            WHERE detail_no = ?`;
+  const [result] = await conn.query(sql, [order_status, detail_no]);
+
+  if (result.affectedRows) {
+    res.send({ success: true });
+  } else {
+    res.send({ success: false });
+  }
+
+  conn.release();
 };

@@ -1,0 +1,147 @@
+doctype html
+html
+	head
+		include adminHead.pug
+		style.
+			.ck-editor__editable {
+				min-height: 700px;
+			}
+	body#page-top
+		include adminHeader.pug
+		#wrapper
+			include adminSideBar.pug
+			
+			#content-wrapper
+				.container-fluid
+					// Breadcrumbs
+					ol.breadcrumb
+						li.breadcrumb-item
+							a(href='/admin/dashboard') 관리자 페이지
+						li.breadcrumb-item.active 상품관리
+
+					// DataTables Example
+					.card.mb-3
+						form(action='/admin/product' method="post" enctype="multipart/form-data" onsubmit="return formSubmit(this);")
+							.card-header
+								i.fas.fa-fw.fa-dolly
+								|  상품등록
+							.card-body
+								.row.justify-content-center
+									.col-lg-6
+										.row
+											.col-lg-6
+												.card.h-100
+													.card-title.text-center.border-bottom.mx-3.py-3
+														span 미리보기 이미지
+													.card-body
+														img#previewImage(src="/images/no-image.png" style="width:100%; height:100%;")
+														input.d-none(type="file" name="thumbnail" required)
+											.col-lg-6
+												.form-group
+														label(for="productCategory") 분류
+														select#productCategory.form-control(name="product_category" required)
+															option(value="헬멧") 헬멧
+															option(value="라이딩웨어") 라이딩웨어
+															option(value="장갑") 장갑
+															option(value="부츠") 부츠
+															option(value="보호구") 보호구
+												.form-group
+														label(for="productName") 상품명
+														input#productName.form-control(type="text" name="product_name" required)
+												.form-group
+														label(for="productBrand") 제조사
+														input#productBrand.form-control(type="text" name="product_brand" required)
+												
+													
+								
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 사이즈
+										.col-md-3
+											.row
+												.col-md-12
+													button#btnAddOption.btn.btn-secondary(type="button") 추가등록
+										.offset-md-2
+								.form-group
+									.row.justify-content-center.align-items-center
+										.col-md-2.text-right 가격
+										.col-md-3
+											input.form-control(type="number" name="product_price" required)
+										.offset-md-2
+								.form-group
+									.row
+										.col-md-8.mx-auto
+											textarea#ckeditor.form-control(name="product_contents" style="resize:none" required)
+							.card-footer.text-right
+								button.btn.btn-primary(type="submit") 수정
+								button.btn.btn-secondary(type="button" onclick='location.href="/admin/dashboard"') 취소
+					
+				include adminFooter.pug
+			// /.content-wrapper
+			// /#wrapper
+			// Scroll to Top Button
+			a.scroll-to-top.rounded(href='#page-top')
+				i.fas.fa-angle-up
+			
+		include adminScript.pug
+		script.
+			$(document).ready(function(){
+				$('.table').DataTable();
+
+				$("#btnAddOption").click(function(){
+					html = `<div class="row align-items-center mb-3">
+							<div class="col-md-3">옵션 이름</div>
+							<div class="col-md-4">
+								<input type="text" name="option_name" class="option_name form-control" />
+							</div>
+							<div class="col-md-2">수량</div>
+							<div class="col-md-3">
+								<input type="number" name="option_max" class="option_max form-control" min="0" />
+							</div>
+						</div>`;
+
+					var addOptionBox = $(this).parents(".col-md-3");
+
+					$(addOptionBox).prepend(html);
+
+					$(".option_max").keyup(function(e){
+						onlyNumber($(this), e);
+					}).keydown(function(e){
+						onlyNumber($(this), e);
+					});
+				});
+
+				ClassicEditor.create($("#ckeditor")[0]).then(editor => {
+					window.editor = editor;
+				}).catch(error => {
+					console.error('There was a problem initializing the editor.', error);
+				})
+			});
+
+			function formSubmit(form){
+				console.log(form);
+
+				return false;
+			}
+
+			function productChangeStatus(self, product_no){
+				$.ajax({
+					type : "POST",
+					url : "/admin/product/delete",
+					data : { product_no : product_no },
+					success : function(res){
+						if(res.changeProductStatus){
+							if($(self).text() == "활성화"){
+								$(self).text("비활성화");
+								$(self).removeClass("btn-success").addClass("btn-danger");
+							} else {
+								$(self).text("활성화");
+								$(self).removeClass("btn-danger").addClass("btn-success");
+							}
+						}
+					},
+					error : function(e){
+						console.log(e);
+					}
+				})
+			}

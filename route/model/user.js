@@ -37,13 +37,14 @@ exports.mypage = (req, res) => {
 exports.modify = async (req, res) => {
   const conn = await db().getConnection();
 
-  user_no = req.session.user_no;
+  const user_no = req.session.user_no;
 
   if (user_no) {
-    sql = `SELECT * FROM user WHERE user_no = ?`;
-    const [user] = await conn.query(sql, user_no);
+    var sql = `SELECT * FROM user WHERE user_no = ?`;
+    const [rows] = await conn.query(sql, user_no);
+    const user = rows[0];
 
-    res.render("modify", { user: user[0] });
+    res.render("modify", { user });
   } else {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
@@ -64,21 +65,24 @@ exports.logout = (req, res) => {
 exports.loginPost = async (req, res) => {
   const conn = await db().getConnection();
 
-  user_id = req.body.userId;
-  user_pw = req.body.userPw;
+  const user_id = req.body.user_id;
+  const user_pw = req.body.user_pw;
 
-  sql =
-    "select user_no, user_name, user_lv, count(*) as rowCount from user where user_id = ? and user_pw = ?";
-  const [user] = await conn.query(sql, [user_id, user_pw]);
+  var sql = `SELECT user_no, user_name, user_lv, count(*) as rowCount FROM user WHERE user_id = ? AND user_pw = ?`;
+  const [rows] = await conn.query(sql, [user_id, user_pw]);
+  const user = rows[0];
 
-  if (user[0].rowCount) {
-    req.session.user_no = user[0].user_no; // 세션에 회원번호 저장
-    req.session.user_name = user[0].user_name; // 세션에 회원이름 저장
-    req.session.user_lv = user[0].user_lv; // 세션에 회원레벨 저장
+  if (user.rowCount) {
+    req.session.user_no = user.user_no; // 세션에 회원번호 저장
+    req.session.user_name = user.user_name; // 세션에 회원이름 저장
+    req.session.user_lv = user.user_lv; // 세션에 회원레벨 저장
 
-    res.send({ user_name: req.session.user_name });
+    res.send({ success: true, message: `${user.user_name} 님 환영합니다.` });
   } else {
-    res.send({ loginFailed: true });
+    res.send({
+      success: false,
+      message: "아이디와 비밀번호를 다시 확인해주세요.",
+    });
   }
 
   conn.release();
@@ -88,12 +92,13 @@ exports.loginPost = async (req, res) => {
 exports.overlapUserId = async (req, res) => {
   const conn = await db().getConnection();
 
-  user_id = req.body.userId;
+  const user_id = req.body.user_id;
 
-  sql = "select user_id from user where user_id = ?";
-  const [user] = await conn.query(sql, user_id);
+  var sql = `select user_id from user where user_id = ?`;
+  const [rows] = await conn.query(sql, user_id);
+  const user = rows[0];
 
-  if (user[0]) {
+  if (user) {
     res.send(true);
   } else {
     res.send(false);
@@ -103,42 +108,38 @@ exports.overlapUserId = async (req, res) => {
 };
 
 // 회원가입 처리 - /user/join
-exports.joinPost = (req, res) => {
-  userId = req.body.userId;
-  userPw = req.body.userPw;
-  userName = req.body.userName;
-  userPhone = req.body.userPhone;
-  userZipCode = req.body.userZipCode;
-  userAddress = req.body.userAddress;
-  userDetailAddress = req.body.userDetailAddress;
+exports.joinPost = async (req, res) => {
+  const conn = await db().getConnection();
 
-  sql =
-    "insert into user(user_id, user_pw, user_name, user_phone, user_zipcode, user_address, user_detail_address, user_lv) values(?, ?, ?, ?, ?, ?, ?, 'user')";
-  db.query(
-    sql,
-    [
-      userId,
-      userPw,
-      userName,
-      userPhone,
-      userZipCode,
-      userAddress,
-      userDetailAddress,
-    ],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        res.send({ sqlError: err });
-      } else {
-        // 영향이 있는 행이 없다면 오류 전송
-        if (result.affectedRows < 1) {
-          res.send({ sqlError: result });
-        } else {
-          res.send();
-        }
-      }
-    }
-  );
+  const user_id = req.body.user_id;
+  const user_pw = req.body.user_pw;
+  const user_name = req.body.user_name;
+  const user_phone = req.body.user_phone;
+  const user_zipcode = req.body.user_zipcode;
+  const user_address = req.body.user_address;
+  const user_detail_address = req.body.user_detail_address;
+
+  var sql = `INSERT INTO user(user_id, user_pw, user_name, user_phone, user_zipcode, user_address, user_detail_address) 
+    VALUES(?, ?, ?, ?, ?, ?, ?)`;
+  const [result] = await conn.query(sql, [
+    user_id,
+    user_pw,
+    user_name,
+    user_phone,
+    user_zipcode,
+    user_address,
+    user_detail_address,
+  ]);
+
+  // 회원가입 성공 시
+  if (result.affectedRows > 0) {
+    res.send({ success: true, message: "회원가입이 완료되었습니다." });
+  } else {
+    res.send({
+      success: false,
+      message: "알 수 없는 오류가 발생했습니다.\n새로고침 후 이용해주세요.",
+    });
+  }
 };
 
 // 장바구니 페이지 - /user/basket
@@ -146,31 +147,28 @@ exports.basket = async (req, res) => {
   const conn = await db().getConnection();
 
   // 로그인 여부 확인
-  user_no = req.session.user_no;
+  const user_no = req.session.user_no;
 
   // 장바구니 상품 개수
-  sql =
-    "select count(user_no) as basketListCount from basket, options natural join product natural join image where user_no = ?;";
-  const [basket_list_count] = await conn.query(sql, user_no);
+  var sql = `SELECT count(user_no) AS basket_list_count FROM basket where user_no = ?;`;
+  var [rows] = await conn.query(sql, user_no);
+  const basket_list_count = rows[0].basket_list_count;
 
-  sql = `SELECT basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price 
-    FROM basket, options
-    NATURAL JOIN product 
-    NATURAL JOIN image 
-    WHERE basket.user_no = ? 
-    AND basket.option_no = options.option_no 
-    ORDER BY basket_datetime desc, basket_no desc;`;
+  var sql = `SELECT basket_no, file_save_name, file_show_name, product_name, basket.option_no, option_name, basket.option_num, product_price 
+            FROM basket, options 
+            NATURAL JOIN product 
+            NATURAL JOIN image 
+            WHERE basket.user_no = ? 
+            AND basket.option_no = options.option_no;`;
 
   // 장바구니 상품 리스트
-  const [basket_list] = await conn.query(sql, user_no);
+  var [rows] = await conn.query(sql, user_no);
+  const basket_list = rows;
 
   // 로그인 상태일 경우
   if (user_no) {
     // 장바구니 상품 개수와 장바구니 상품 리스트를 렌더링
-    res.render("basket", {
-      basketListCount: basket_list_count[0].basketListCount,
-      basketList: basket_list,
-    });
+    res.render("basket", { basket_list_count, basket_list });
   } else {
     // 로그인 상태가 아닐 경우
     res.send(
@@ -231,15 +229,16 @@ exports.basketDeletePost = (req, res) => {
 exports.orderInfo = async (req, res) => {
   const conn = await db().getConnection(); // 커넥션 생성
 
-  user_no = req.session.user_no;
+  const user_no = req.session.user_no;
 
   if (user_no) {
     // 주문 내역 개수
-    sql = `SELECT count(user_no) AS order_list_count FROM orders WHERE user_no = ?;`;
-    const [order_list_count] = await conn.query(sql, user_no);
+    var sql = `SELECT count(user_no) AS order_list_count FROM orders WHERE user_no = ?;`;
+    var [rows] = await conn.query(sql, user_no);
+    const order_list_count = rows[0].order_list_count;
 
     // 주문 내역 리스트
-    sql = `SELECT file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
+    var sql = `SELECT file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
       FROM orders, detail, options, product, image 
       WHERE orders.order_no = detail.order_no 
       AND detail.option_no = options.option_no 
@@ -247,12 +246,10 @@ exports.orderInfo = async (req, res) => {
       AND product.product_no = image.product_no 
       AND user_no = ? 
       ORDER BY order_date DESC;`;
-    const [order_list] = await conn.query(sql, user_no);
+    var [rows] = await conn.query(sql, user_no);
+    const order_list = rows;
 
-    res.render("orderInfo", {
-      order_list: order_list,
-      order_list_count: order_list_count[0].order_list_count,
-    });
+    res.render("orderInfo", { order_list, order_list_count });
   } else {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'

@@ -13,10 +13,10 @@ html
 							.loginBoxArea
 								form#loginForm(action="/user/login" method="post")
 									.form-group
-										input(type="text" name="userId" id="userId")
+										input(type="text" name="user_id" id="userId")
 										label(for="userId") 아이디
 									.form-group
-										input(type="password" name="userPw" id="userPw")
+										input(type="password" name="user_pw" id="userPw")
 										label(for="userPw") 비밀번호
 									p.loginBtn
 										button(type="submit" id="loginBtn") 로그인
@@ -40,13 +40,13 @@ html
 				url : "/user/login",
 				data : $(this).serialize(),
 				success : (res) => {
-					if(res.loginFailed){
-						alert("아이디와 비밀번호를 다시 확인해주세요.");
-						return false;
+					if(res.message){
+						alert(res.message);
 					}
 
-					alert(res.user_name + "님 환영합니다.");
-					link("/");
+					if(res.success){
+						link("/");
+					}
 				},
 				error : (e) => {
 					console.log(e);
