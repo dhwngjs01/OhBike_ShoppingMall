@@ -27,8 +27,8 @@ header#header
 				a(href="/" title="HOME")
 					img(src="../images/logo.png", alt="Oh! 바이크" title="Oh! 바이크")
 			#search
-				form(action="/", method="get", onsubmit="return false;")
-					input(type="text", name="searchKey")
+				form(action="/public/product", method="get")
+					input(type="text", name="keyword" value= keyword)
 					button(type="submit")
 						i(class="fas fa-search")
 	#headerBottom
