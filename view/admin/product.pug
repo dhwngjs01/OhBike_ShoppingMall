@@ -58,9 +58,9 @@ html(lang="ko")
 												td
 													button.btn.btn-primary(type="button" onclick=`link('/admin/productModify?product_no=${product.product_no}')`) 수정
 													- if(product.product_enable == 1){
-														button.btn.btn-danger(type="button" data-toggle="modal" data-target="#activeProductModal" data-product_no=`${product.product_no}`) 비활성화
+														button.btn.btn-danger(type="button" data-product_no=`${product.product_no}` onclick='openActiveProductModal(this)') 비활성화
 													- } else {
-														button.btn.btn-success(type="button" data-toggle="modal" data-target="#activeProductModal" data-product_no=`${product.product_no}`) 활성화
+														button.btn.btn-success(type="button" data-product_no=`${product.product_no}` onclick='openActiveProductModal(this)') 활성화
 													- }
 												
 										
@@ -84,7 +84,7 @@ html(lang="ko")
 								i.fas.fa-times
 					.modal-body
 					.modal-footer
-						button.btn.btn-primary(type='button') 확인
+						button#confirmButton.btn.btn-primary(type='button') 확인
 						button.btn.btn-secondary(type='button', data-dismiss='modal') 취소
 
 		
@@ -93,39 +93,45 @@ html(lang="ko")
 		script.
 			$(document).ready(function(){
 				$('.table').DataTable();
-
-				$("#activeProductModal").on("show.bs.modal", function(e){
-					var clicked_button = $(e.relatedTarget);
-					var product_no = $(e.relatedTarget).data("product_no");
-					var product_enable = $(e.relatedTarget).text();
-					var modal = $(this);
-					var modal_body = modal.find(".modal-body");
-					var confirm_button = modal.find(".modal-footer").children().eq(0);
-
-					if(product_enable === "활성화"){
-						confirm_button.removeClass("btn-danger").addClass("btn-success");
-						modal_body.html(`상품을 <span class="text-success btn-link">${product_enable}</span> 하시겠습니까?`);
-					} else {
-						confirm_button.removeClass("btn-primary").addClass("btn-danger");
-						modal_body.html(`상품을 <a href="javascript:void(0)" class="text-danger btn-link cursor-pointer" onclick="productDelete(${product_no})">${product_enable}</a> 하시겠습니까?`);
-					}
-
-					
-					confirm_button.text(product_enable);
-					confirm_button.attr("onclick", `productChangeStatus(${product_no})`);
-
-				});
 			});
 
-			function productChangeStatus(product_no){
+			function openActiveProductModal(self){
+				var product_no = $(self).data("product_no");
+				var product_enable = $(self).text();
+				var modal = $("#activeProductModal");
+				var modal_body = $(".modal-body");
+				var confirm_button = $("#confirmButton");
+
+				console.log(self);
+
+				if(product_enable === "활성화"){
+					confirm_button.removeClass("btn-danger").addClass("btn-success");
+					modal_body.html(`상품을 <span class="text-success btn-link">${product_enable}</span> 하시겠습니까?`);
+				} else {
+					confirm_button.removeClass("btn-primary").addClass("btn-danger");
+					modal_body.html(`상품을 <a href="javascript:void(0)" class="text-danger btn-link cursor-pointer" onclick="productDelete(${product_no})">${product_enable}</a> 하시겠습니까?`);
+				}
+				
+				$(confirm_button).text(product_enable);
+				$(confirm_button).off("click").click(function(){
+					productChangeStatus(self, product_no);
+				});
+
+				$("#activeProductModal").modal("show");
+			}
+
+			function productChangeStatus(clicked_button, product_no){
 				$.ajax({
 					type : "PUT",
 					url : "/admin/product/status",
 					data : { product_no },
 					success : () => {
-						$("#activeProductModal").modal("hide");
+						var clicked_button_text = $(clicked_button).text();
 
-						location.reload();
+						$("#activeProductModal").modal("hide");
+						$(clicked_button).text(clicked_button_text === "활성화" ? "비활성화" : "활성화");
+						$(clicked_button).removeClass(clicked_button_text === "활성화" ? "btn-success" : "btn-danger");
+						$(clicked_button).addClass(clicked_button_text === "활성화" ? "btn-danger" : "btn-success");
 					},
 					error : function(e){
 						console.log(e);

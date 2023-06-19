@@ -116,6 +116,9 @@ html
 					var option_list_group = $("#optionListGroup");
 
 					$(option_list_group).append(html);
+					$(option_list_group).scrollTop($(option_list_group)[0].scrollHeight);
+					
+					$(html).find(".option_name").focus();
 
 					$(".option_num").keyup(function(e){
 						onlyNumber($(this), e);

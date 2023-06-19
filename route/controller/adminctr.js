@@ -8,7 +8,18 @@ const storage = multer.diskStorage({
     cb(null, "resources/uploadFiles");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + "_" + file.originalname);
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const date = now.getDate();
+    const hours = now.getHours() < 10 ? "0" + now.getHours() : now.getHours();
+    const minutes =
+      now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes();
+    const seconds = now.getSeconds();
+    const date_format = `${year}${month}${date}_${hours}${minutes}${seconds}`;
+
+    cb(null, date_format + "_" + file.originalname);
   },
 });
 
@@ -48,7 +59,7 @@ router.get(
   admin.productModifyPage
 );
 router.post("/product", upload.any(), admin.productAdd); // 상품추가
-router.put("/product", admin.productModify); // 상품수정
+router.put("/product", upload.any(), admin.productModify); // 상품수정
 router.post("/product/image", ckeditor_upload.any(), admin.productImage); // 이미지 업로드
 router.put("/product/status", admin.changeProductStatus);
 router.delete("/product", admin.deleteProduct);

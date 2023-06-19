@@ -1,5 +1,6 @@
 var db = require("../../db");
 
+// 대쉬보드
 exports.dashboard = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -48,6 +49,7 @@ exports.dashboard = async (req, res) => {
   conn.release();
 };
 
+// 회원 관리
 exports.user = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -66,6 +68,7 @@ exports.user = async (req, res) => {
   conn.release();
 };
 
+// 상품 관리
 exports.product = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -85,107 +88,12 @@ exports.product = async (req, res) => {
   conn.release();
 };
 
+// 상품 추가 페이지
 exports.productAddPage = async (req, res) => {
   res.render("productAdd");
 };
 
-exports.productModifyPage = async (req, res) => {
-  const conn = await db().getConnection();
-
-  const product_no = req.query.product_no;
-
-  const sql = `SELECT * 
-        FROM product 
-        NATURAL JOIN image 
-        NATURAL JOIN options 
-        WHERE product_no = ?`;
-  var [rows] = await conn.query(sql, product_no);
-
-  const product = {};
-
-  product.product_no = rows[0].product_no;
-  product.product_name = rows[0].product_name;
-  product.product_en_name = rows[0].product_en_name;
-  product.product_brand = rows[0].product_brand;
-  product.product_category = rows[0].product_category;
-  product.product_contents = rows[0].product_contents;
-  product.product_price = rows[0].product_price;
-  product.file_save_name = rows[0].file_save_name;
-  product.file_show_name = rows[0].file_show_name;
-  product.option_list = [];
-
-  for (var i = 0; i < rows.length; i++) {
-    product.option_list.push({
-      option_no: rows[i].option_no,
-      option_name: rows[i].option_name,
-      option_num: rows[i].option_num,
-    });
-  }
-
-  res.render("productModify", { product });
-
-  conn.release();
-};
-
-exports.changeProductStatus = async (req, res) => {
-  const conn = await db().getConnection();
-
-  const product_no = req.body.product_no;
-
-  var sql = `UPDATE product 
-            SET product_enable = not product_enable
-            WHERE product_no = ?`;
-  var [result] = await conn.query(sql, [product_no]);
-
-  if (result.affectedRows) {
-    res.send({ success: true });
-  } else {
-    res.send({ success: false });
-  }
-
-  conn.release();
-};
-
-exports.order = async (req, res) => {
-  const conn = await db().getConnection();
-
-  var sql = `SELECT detail_no, product_name, option_name, detail.option_num, detail.product_price, user_name, order_status, order_date
-            FROM orders, detail, options, product, user
-            WHERE orders.order_no = detail.order_no
-            AND detail.option_no = options.option_no
-            AND options.product_no = product.product_no
-            AND orders.user_no = user.user_no
-            ORDER BY order_date DESC;`;
-  var [rows] = await conn.query(sql);
-  const order_list = rows;
-
-  order_status_list = ["배송준비중", "배송중", "배송완료", "주문취소"];
-
-  res.render("order", { order_list, order_status_list });
-
-  conn.release();
-};
-
-exports.changeOrderStatus = async (req, res) => {
-  const conn = await db().getConnection();
-
-  const order_status = req.body.order_status;
-  const detail_no = req.body.detail_no;
-
-  var sql = `UPDATE detail 
-            SET order_status = ? 
-            WHERE detail_no = ?`;
-  const [result] = await conn.query(sql, [order_status, detail_no]);
-
-  if (result.affectedRows) {
-    res.send({ success: true });
-  } else {
-    res.send({ success: false });
-  }
-
-  conn.release();
-};
-
+// 상품 등록
 exports.productAdd = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -259,6 +167,46 @@ exports.productAdd = async (req, res) => {
   conn.release();
 };
 
+// 상품 수정 페이지
+exports.productModifyPage = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_no = req.query.product_no;
+
+  const sql = `SELECT * 
+        FROM product 
+        NATURAL JOIN image 
+        NATURAL JOIN options 
+        WHERE product_no = ?`;
+  var [rows] = await conn.query(sql, product_no);
+
+  const product = {};
+
+  product.product_no = rows[0].product_no;
+  product.product_name = rows[0].product_name;
+  product.product_en_name = rows[0].product_en_name;
+  product.product_brand = rows[0].product_brand;
+  product.product_category = rows[0].product_category;
+  product.product_contents = rows[0].product_contents;
+  product.product_price = rows[0].product_price;
+  product.file_save_name = rows[0].file_save_name;
+  product.file_show_name = rows[0].file_show_name;
+  product.option_list = [];
+
+  for (var i = 0; i < rows.length; i++) {
+    product.option_list.push({
+      option_no: rows[i].option_no,
+      option_name: rows[i].option_name,
+      option_num: rows[i].option_num,
+    });
+  }
+
+  res.render("productModify", { product });
+
+  conn.release();
+};
+
+// 상품 수정
 exports.productModify = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -274,18 +222,13 @@ exports.productModify = async (req, res) => {
   const option_name = req.body.option_name;
   const option_num = req.body.option_num;
 
-  const file = req.files[0];
+  const file = req.files.length > 0 ? req.files[0] : undefined;
   const file_save_name = file && file.filename;
-
-  if (file === undefined) {
-    res.send({ success: false, message: "이미지를 선택해주세요." });
-    return;
-  }
 
   var sql = `UPDATE product
             SET product_name = ?, product_en_name = ?, product_brand = ?, product_category = ?, product_contents = ?, product_price = ?
             WHERE product_no = ?`;
-  var [result] = await conn.query(sql, [
+  var [update_product_result] = await conn.query(sql, [
     product_name,
     product_en_name,
     product_brand,
@@ -296,47 +239,80 @@ exports.productModify = async (req, res) => {
   ]);
 
   // 상품 수정 성공
-  if (result.affectedRows) {
+  if (update_product_result.affectedRows) {
     var sql = "";
-
     for (var i = 0; i < option_no.length; i++) {
       sql += `UPDATE options
-              SET option_name = ?, option_num = ?
-              WHERE option_no = ?;`;
+              SET option_name = '${option_name[i]}', option_num = ${option_num[i]}
+              WHERE option_no = ${option_no[i]};`;
     }
-    var [result] = await conn.query(sql, [option_name, option_num, option_no]);
+
+    var [update_options_result] = await conn.query(sql, [
+      option_name,
+      option_num,
+      option_no,
+    ]);
 
     // 재고 수정 성공
-    if (result.affectedRows) {
-      var sql = `UPDATE image
-                SET file_show_name = ?, file_save_name = ?
-                WHERE product_no = ?`;
-      var [result] = await conn.query(sql, [
-        product_name,
-        file_save_name,
-        product_no,
-      ]);
+    if (update_options_result[0].affectedRows) {
+      // 상품 썸네일 이미지를 수정했을 경우
+      if (file !== undefined) {
+        var sql = `UPDATE image
+                  SET file_show_name = ?, file_save_name = ?
+                  WHERE product_no = ?`;
+        var [update_image_result] = await conn.query(sql, [
+          product_name,
+          file_save_name,
+          product_no,
+        ]);
 
-      // 이미지 수정 성공
-      if (result.affectedRows) {
-        res.send({ success: true, message: "상품이 수정되었습니다." });
+        // 이미지 수정 성공
+        if (update_image_result.affectedRows) {
+          res.send({ success: true, message: "상품이 수정되었습니다." });
+        } else {
+          // 이미지 수정 실패
+          res.send({
+            success: false,
+            message: "이미지 수정에 실패하였습니다.",
+          });
+        }
       } else {
-        // 이미지 수정 실패
-        res.send({ success: false, message: "이미지 수정에 실패하였습니다." });
+        // 상품 썸네일 이미지를 수정하지 않았을 경우
+        res.send({ success: true, message: "상품이 수정되었습니다." });
       }
     } else {
       // 재고 수정 실패
       res.send({ success: false, message: "재고 수정에 실패하였습니다." });
     }
+  } else {
+    // 상품 수정 실패
+    res.send({ success: false, message: "상품 수정에 실패하였습니다." });
   }
 
   conn.release();
 };
 
-exports.productImage = async (req, res) => {
-  res.send({ url: "/ckeditor_upload/" + req.files[0].filename });
+// 상품 활성화 / 비활성화 변경
+exports.changeProductStatus = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_no = req.body.product_no;
+
+  var sql = `UPDATE product 
+            SET product_enable = not product_enable
+            WHERE product_no = ?`;
+  var [result] = await conn.query(sql, [product_no]);
+
+  if (result.affectedRows) {
+    res.send({ success: true });
+  } else {
+    res.send({ success: false });
+  }
+
+  conn.release();
 };
 
+// 상품 삭제
 exports.deleteProduct = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -363,4 +339,51 @@ exports.deleteProduct = async (req, res) => {
   else res.send({ success: false });
 
   conn.release();
+};
+
+// 주문 목록
+exports.order = async (req, res) => {
+  const conn = await db().getConnection();
+
+  var sql = `SELECT detail.detail_no, product.product_name, options.option_name, detail.option_num, detail.product_price, user.user_name, detail.order_status, orders.order_date
+            FROM orders, detail, options, product, user
+            WHERE orders.order_no = detail.order_no
+            AND detail.option_no = options.option_no
+            AND options.product_no = product.product_no
+            AND orders.user_no = user.user_no
+            ORDER BY order_date DESC;`;
+  var [rows] = await conn.query(sql);
+  const order_list = rows;
+
+  order_status_list = ["배송준비중", "배송중", "배송완료", "주문취소"];
+
+  res.render("order", { order_list, order_status_list });
+
+  conn.release();
+};
+
+// 주문 상태 변경
+exports.changeOrderStatus = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const order_status = req.body.order_status;
+  const detail_no = req.body.detail_no;
+
+  var sql = `UPDATE detail 
+            SET order_status = ? 
+            WHERE detail_no = ?`;
+  const [result] = await conn.query(sql, [order_status, detail_no]);
+
+  if (result.affectedRows) {
+    res.send({ success: true });
+  } else {
+    res.send({ success: false });
+  }
+
+  conn.release();
+};
+
+// CKEditor 이미지 업로드
+exports.productImage = async (req, res) => {
+  res.send({ url: "/ckeditor_upload/" + req.files[0].filename });
 };

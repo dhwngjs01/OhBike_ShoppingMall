@@ -59,7 +59,7 @@ html
 																option(value=`${status}` selected) #{status}
 															else
 																option(value=`${status}`) #{status}
-												td.align-middle #{order.order_date.format("yyyy년 MM월 dd일 HH시 mm분 ss초")}
+												td.align-middle #{order.order_date.format("yyyy-MM-dd HH:mm:ss")}
 					
 				include adminFooter.pug
 			// /.content-wrapper
