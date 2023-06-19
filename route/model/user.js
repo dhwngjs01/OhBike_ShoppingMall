@@ -33,8 +33,8 @@ exports.mypage = (req, res) => {
   }
 };
 
-// 회원정보수정 - /user/modify
-exports.modify = async (req, res) => {
+// 회원정보수정 - GET /user/modify
+exports.modifyPage = async (req, res) => {
   const conn = await db().getConnection();
 
   const user_no = req.session.user_no;
@@ -49,6 +49,72 @@ exports.modify = async (req, res) => {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
     );
+  }
+
+  conn.release();
+};
+
+// 회원정보수정 - PUT /user/:user_no
+exports.modify = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const user_no = req.session.user_no;
+
+  if (user_no) {
+    var user_pw = req.body.user_pw;
+    const user_pw2 = req.body.user_pw2;
+    const user_name = req.body.user_name;
+    const user_phone = req.body.user_phone;
+    const user_zipcode = req.body.user_zipcode;
+    const user_address = req.body.user_address;
+    const user_detail_address = req.body.user_detail_address;
+
+    if (user_pw != user_pw2) {
+      res.send({
+        success: false,
+        message: "비밀번호가 일치하지 않습니다.",
+      });
+
+      return;
+    }
+
+    var sql = `SELECT user_pw FROM user WHERE user_no = ?`;
+    const [rows] = await conn.query(sql, user_no);
+    const user = rows[0];
+
+    if (user_pw == "") {
+      user_pw = user.user_pw;
+    }
+
+    var sql = `UPDATE user 
+              SET user_pw = ?, user_name = ?, user_phone = ?, user_zipcode = ?, user_address = ?, user_detail_address = ? 
+              WHERE user_no = ?`;
+    const [result] = await conn.query(sql, [
+      user_pw,
+      user_name,
+      user_phone,
+      user_zipcode,
+      user_address,
+      user_detail_address,
+      user_no,
+    ]);
+
+    if (result.affectedRows > 0) {
+      res.send({
+        success: true,
+        message: "회원정보가 수정되었습니다.",
+      });
+    } else {
+      res.send({
+        success: false,
+        message: "알 수 없는 오류가 발생했습니다.\n새로고침 후 이용해주세요.",
+      });
+    }
+  } else {
+    res.send({
+      success: false,
+      message: "로그인 후 이용할 수 있는 서비스입니다.",
+    });
   }
 
   conn.release();
@@ -233,9 +299,9 @@ exports.orderInfo = async (req, res) => {
 
   if (user_no) {
     // 주문 내역 개수
-    var sql = `SELECT count(user_no) AS order_list_count FROM orders WHERE user_no = ?;`;
+    var sql = `SELECT order_no FROM orders WHERE user_no = ?;`;
     var [rows] = await conn.query(sql, user_no);
-    const order_list_count = rows[0].order_list_count;
+    const order_list = rows;
 
     // 주문 내역 리스트
     var sql = `SELECT file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
@@ -247,9 +313,9 @@ exports.orderInfo = async (req, res) => {
       AND user_no = ? 
       ORDER BY order_date DESC;`;
     var [rows] = await conn.query(sql, user_no);
-    const order_list = rows;
+    const detail_list = rows;
 
-    res.render("orderInfo", { order_list, order_list_count });
+    res.render("orderInfo", { order_list, detail_list });
   } else {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'
@@ -257,4 +323,52 @@ exports.orderInfo = async (req, res) => {
   }
 
   conn.release(); // 커넥션 반환
+};
+
+// 회원탈퇴 페이지 - /user/dieMySelf
+exports.dieMySelfPage = (req, res) => {
+  res.render("dieMySelf");
+};
+
+// 회원탈퇴 처리 - /user/dieMySelf
+exports.dieMySelf = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const user_no = req.session.user_no;
+
+  if (user_no) {
+    var sql = `SELECT user_pw FROM user WHERE user_no = ?`;
+    const [rows] = await conn.query(sql, user_no);
+
+    const user_pw = rows[0].user_pw;
+
+    if (user_pw != req.body.user_pw) {
+      res.send({
+        password_invalid: true,
+        message: "비밀번호가 일치하지 않습니다.",
+      });
+    } else {
+      var sql = `DELETE FROM user WHERE user_no = ?`;
+      const [result] = await conn.query(sql, user_no);
+
+      if (result.affectedRows > 0) {
+        req.session.destroy(function () {
+          res.send({
+            success: true,
+            message: "회원탈퇴가 완료되었습니다.",
+          });
+        });
+      } else {
+        res.send({
+          message: "알 수 없는 오류가 발생했습니다.\n새로고침 후 이용해주세요.",
+        });
+      }
+    }
+  } else {
+    res.send({
+      message: "로그인 후 이용할 수 있는 서비스입니다.",
+    });
+  }
+
+  conn.release();
 };
