@@ -55,12 +55,13 @@ html
 				});
 
 				const category = `#{category}`;
+				const keyword = `#{keyword}`;
 				brand = JSON.stringify(brand);
 
 				$.ajax({
 					type : "POST",
 					url : "/public/getProductList",
-					data : { category, brand },
+					data : { category, brand, keyword },
 					success : (res) => {
 						$("#getProductList").html(res);
 

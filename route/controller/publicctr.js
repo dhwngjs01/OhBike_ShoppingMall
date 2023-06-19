@@ -12,6 +12,7 @@ router.get(
   ["/helmet", "/ridingWear", "/gloves", "/boots", "/protection"],
   public.productListPage
 );
+router.get(["/product", "/product?keyword=:keyword"], public.searchProduct);
 router.get(
   ["/productDetail", "/productDetail?productNo=:productNo"],
   public.productDetail

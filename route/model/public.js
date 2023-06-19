@@ -47,6 +47,7 @@ exports.getProductList = async (req, res) => {
   const product_category = req.body.category;
   const product_brand_arr = JSON.parse(req.body.brand);
 
+  // 상품 브랜드 쿼리문 생성
   var product_brand_sql = "";
   if (product_brand_arr.length > 0) {
     product_brand_sql = "AND";
@@ -78,6 +79,34 @@ exports.getProductList = async (req, res) => {
   const product_list = rows;
 
   res.render("ajaxProductList", { product_list, product_count });
+
+  conn.release();
+};
+
+// 상품 검색
+exports.searchProduct = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const keyword = req.query.keyword;
+
+  // 상품 개수 구하기 쿼리문 생성 및 실행
+  var sql = `SELECT count(product_no) AS product_count 
+            FROM product 
+            WHERE product_name LIKE ? 
+            OR product_brand LIKE ?;`;
+  var [rows] = await conn.query(sql, [`%${keyword}%`, `%${keyword}%`]);
+  const product_count = rows[0].product_count;
+
+  // 상품 목록 쿼리문 생성 및 실행
+  var sql = `SELECT * 
+            FROM product 
+            NATURAL JOIN image 
+            WHERE product_name LIKE ?
+            OR product_brand LIKE ?;`;
+  var [rows] = await conn.query(sql, [`%${keyword}%`, `%${keyword}%`]);
+  const product_list = rows;
+
+  res.render("searchProductList", { product_list, product_count, keyword });
 
   conn.release();
 };

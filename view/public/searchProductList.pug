@@ -1,0 +1,41 @@
+doctype html
+html
+	head
+		include ../head.pug
+	body
+		#wrap
+			include ../header.pug
+			#contents
+				#getProductList
+					.wrap1280
+						#productListTop
+							span.productCount
+								span.text-red #{product_count.numberWithCommas()} 
+								|개의 상품이 있습니다.
+							span.productBrand
+								|(브랜드 
+								span.text-red 전체
+								|에서 상품)
+						#productList
+							- let max_count = 5;
+
+							each product, i in product_list
+								- if(i % max_count == 0)
+									|<ul class="row">
+								
+								li.col
+									a(href=`/public/productDetail?productNo=${product.product_no}`)
+										.image
+											img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}`)
+										p #{product.product_brand}
+										p #{product.product_name}
+										p #{product.product_en_name}
+										p.productPrice
+											span.text-red #{product.product_price.numberWithCommas()} 
+											|원
+								- if(i % max_count == max_count - 1)
+									|</ul>
+
+			include ../footer.pug
+		include ../script.pug
+			
