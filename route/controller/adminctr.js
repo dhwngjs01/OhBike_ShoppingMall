@@ -42,15 +42,16 @@ router.get("/dashboard", admin.dashboard); // 메인 페이지
 router.get("/user", admin.user); // 회원목록
 
 router.get("/product", admin.product); // 상품관리
+router.get("/productAdd", admin.productAddPage); // 상품추가 페이지
 router.get(
   ["/productModify", "/productModify?product_no=:product_no"],
   admin.productModifyPage
 );
+router.post("/product", upload.any(), admin.productAdd); // 상품추가
 router.put("/product", admin.productModify); // 상품수정
-router.get("/productAdd", admin.productAddPage); // 상품추가 페이지
-router.post("/productAdd", upload.any(), admin.productAdd); // 상품추가
 router.post("/product/image", ckeditor_upload.any(), admin.productImage); // 이미지 업로드
-router.post("/product/delete", admin.changeProductStatus);
+router.put("/product/status", admin.changeProductStatus);
+router.delete("/product", admin.deleteProduct);
 
 router.get("/order", admin.order);
 router.post("/order/change", admin.changeOrderStatus);

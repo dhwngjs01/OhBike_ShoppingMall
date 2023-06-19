@@ -336,3 +336,31 @@ exports.productModify = async (req, res) => {
 exports.productImage = async (req, res) => {
   res.send({ url: "/ckeditor_upload/" + req.files[0].filename });
 };
+
+exports.deleteProduct = async (req, res) => {
+  const conn = await db().getConnection();
+
+  const product_no = req.body.product_no;
+
+  var sql = `DELETE FROM product
+            WHERE product_no = ?`;
+  var [product_delete_result] = await conn.query(sql, product_no);
+
+  var sql = `DELETE FROM options
+          WHERE product_no = ?`;
+  var [options_delete_result] = await conn.query(sql, product_no);
+
+  var sql = `DELETE FROM image
+          WHERE product_no = ?`;
+  var [image_delete_result] = await conn.query(sql, product_no);
+
+  if (
+    product_delete_result.affectedRows &&
+    options_delete_result.affectedRows &&
+    image_delete_result.affectedRows
+  )
+    res.send({ success: true });
+  else res.send({ success: false });
+
+  conn.release();
+};
