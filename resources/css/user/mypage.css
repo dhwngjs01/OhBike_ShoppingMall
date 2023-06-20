@@ -1,0 +1,58 @@
+/* myPage */
+#myPage {
+  float: left;
+  width: 100%;
+  padding: 30px 0;
+}
+
+#myPage .right {
+  float: left;
+  width: 75%;
+  border-left: 1px solid #bfbfbf;
+  padding-left: 30px;
+  margin-bottom: 30px;
+}
+#myPage .right .linkBox {
+  float: left;
+  width: 100%;
+  margin-top: 43px;
+  border: 1px solid #bfbfbf;
+  border-top: 3px solid #94c3bb;
+}
+#myPage .right .linkBox > li {
+  float: left;
+  width: calc(100% / 3);
+}
+#myPage .right .linkBox > li > a {
+  float: left;
+  width: 100%;
+  height: 100%;
+  padding: 60px 0;
+}
+#myPage .right .linkBox > li:nth-child(3n + 1) > a {
+  border: 0;
+}
+#myPage .right .linkBox > li:nth-child(-n + 3) > a {
+  border-bottom: 1px solid #bfbfbf;
+}
+#myPage .right .linkBox > li:not(:nth-child(3n + 1)) > a {
+  border-left: 1px solid #bfbfbf;
+}
+#myPage .right .linkBox > li:last-child > a {
+  border-right: 1px solid #bfbfbf;
+}
+#myPage .right .linkBox > li .image {
+  float: left;
+  width: 100%;
+  text-align: center;
+}
+#myPage .right .linkBox > li p {
+  float: left;
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+}
+#myPage .right .image > * {
+  font-size: 60px;
+  color: #94c3bb;
+}

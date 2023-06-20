@@ -1,0 +1,134 @@
+/* Font Face */
+@font-face {
+  font-family: "Nanum Gothic";
+  src: url("../../font/NanumGothic.woff") format("woff");
+}
+@font-face {
+  font-family: "slick";
+  src: url("../../font/slick.woff") format("woff");
+}
+
+/* Init */
+/* Init */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  letter-spacing: -0.5px;
+  font-family: "Nanum Gothic";
+  font-size: 14px;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+html {
+  overflow-y: scroll;
+}
+ul,
+ol,
+li {
+  list-style: none;
+}
+input,
+textarea {
+  outline: none;
+}
+a {
+  text-decoration: none;
+  color: #000;
+}
+img {
+  vertical-align: middle;
+}
+
+/* Layout */
+#wrap {
+  min-width: 1000px;
+  overflow: hidden;
+}
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+.wrap1280 {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.border {
+  border: 1px solid #bfbfbf !important;
+}
+
+.border-right {
+  border-right: 1px solid #bfbfbf !important;
+}
+
+.border-left {
+  border-left: 1px solid #bfbfbf !important;
+}
+
+.border-top {
+  border-top: 1px solid #bfbfbf !important;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #bfbfbf !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-end {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-decoration-line-through {
+  text-decoration: line-through !important;
+}
+
+.fw-bold {
+  font-weight: bold !important;
+}
+
+.fs-1 {
+  font-size: 6rem !important;
+}
+.fs-2 {
+  font-size: 3rem !important;
+}
+.fs-3 {
+  font-size: 2rem !important;
+}
+.fs-4 {
+  font-size: 1.5rem !important;
+}
+.fs-5 {
+  font-size: 1rem !important;
+}
+.fs-6 {
+  font-size: 0.875rem !important;
+}
+.fs-7 {
+  font-size: 0.75rem !important;
+}
+.fs-8 {
+  font-size: 0.66rem !important;
+}
+.fs-9 {
+  font-size: 0.5rem !important;
+}

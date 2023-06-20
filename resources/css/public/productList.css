@@ -1,0 +1,136 @@
+/* productList */
+#productList {
+  float: left;
+  width: 100%;
+}
+#brandList {
+  float: left;
+  width: 100%;
+  border: 2px solid #94c3bb;
+  display: flex;
+}
+#brandList .left {
+  float: left;
+  width: 15%;
+  border-right: 1px dotted #94c3bb;
+  display: flex;
+  align-items: center;
+  background-color: rgba(200, 200, 200, 0.1);
+}
+#brandList .left .title {
+  float: left;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#brandList .right {
+  float: left;
+  width: 85%;
+}
+#brandList .brandList {
+  float: left;
+  width: 100%;
+}
+#brandList .brandList > li {
+  float: left;
+  width: calc(100% / 5);
+}
+#brandList .brandList > li > input {
+  display: none;
+}
+#brandList .brandList > li > label {
+  float: left;
+  width: 100%;
+  cursor: pointer;
+  padding: 15px;
+  padding-right: 0;
+  font-size: 13px;
+  border-right: 1px dotted #bfbfbf;
+  border-bottom: 1px dotted #bfbfbf;
+  transition: background-color 0.2s;
+}
+#brandList .brandList > li:nth-child(5n) > label {
+  border-right: 0;
+}
+#brandList .brandList > li > label:hover {
+  background-color: rgba(100, 100, 100, 0.1);
+}
+#brandList .brandList > li > label.active {
+  background-color: rgba(100, 100, 100, 0.1);
+}
+
+#getProductList {
+  float: left;
+  width: 100%;
+  margin-top: 50px;
+}
+#productListTop {
+  float: left;
+  width: 100%;
+  border-bottom: 1px solid #bfbfbf;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+#productListTop > .productCount {
+  margin-right: 5px;
+}
+#productListTop > .productCount > .text-red {
+  color: #e10701;
+  font-size: 23px;
+  font-weight: bold;
+}
+#productListTop > .productBrand > .text-red {
+  color: #e10701;
+}
+#productList {
+  float: left;
+  width: 100%;
+}
+#productList > .row {
+  float: left;
+  width: 100%;
+  margin-bottom: 70px;
+}
+#productList > .row > .col {
+  float: left;
+  width: calc(100% / 5 - 20px);
+  margin: 0 10px;
+}
+#productList > .row > .col:after {
+  clear: both;
+  display: block;
+  content: "";
+}
+#productList > .row > .col > a {
+  float: left;
+  width: 100%;
+}
+#productList > .row > .col > a > .image {
+  float: left;
+  width: 100%;
+  margin-bottom: 15px;
+}
+#productList > .row > .col > a > .image > img {
+  float: left;
+  width: 100%;
+}
+#productList > .row > .col > a > p {
+  float: left;
+  width: 100%;
+  line-height: 170%;
+  font-size: 13px;
+}
+#productList > .row > .col > a > .productPrice {
+  float: left;
+  width: 100%;
+  text-align: right;
+  margin-top: 15px;
+  font-size: 16px;
+}
+#productList > .row > .col > a > .productPrice > .text-red {
+  font-size: 22px;
+  color: #e10701;
+  font-weight: bold;
+}

@@ -1,0 +1,112 @@
+/* Header */
+#header {
+  float: left;
+  width: 100%;
+}
+
+#headerTop {
+  float: left;
+  width: 100%;
+  background-color: #e2e2e2;
+}
+#util {
+  float: right;
+}
+#util li {
+  float: left;
+  padding: 8px 0;
+  padding-left: 25px;
+}
+#util li:first-child {
+  padding-left: 0;
+}
+#util li a {
+  float: left;
+  color: #666;
+  font-size: 13px;
+}
+
+#headerMain {
+  float: left;
+  width: 100%;
+  padding: 15px 0;
+}
+#logo {
+  float: left;
+  height: 80px;
+}
+#logo a {
+  float: left;
+  height: 100%;
+}
+#logo a img {
+  float: left;
+  height: 100%;
+}
+
+#search {
+  float: left;
+  width: 40%;
+  padding-left: 40px;
+  padding-top: 15px;
+}
+#search form {
+  float: left;
+  width: 100%;
+  position: relative;
+}
+#search input[type="text"] {
+  float: left;
+  width: 100%;
+  line-height: 40px;
+  padding-left: 20px;
+  padding-right: 45px;
+  border-radius: 20px;
+  border: 2px solid #94c3bb;
+  transition: border 0.5s;
+}
+#search input[type="text"]:focus {
+  border: 2px solid #3cd4bb;
+}
+#search button {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: 0;
+  color: #94c3bb;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#headerBottom {
+  float: left;
+  width: 100%;
+  background-color: #94c3bb;
+}
+#menu {
+  float: left;
+  width: 100%;
+}
+.menu {
+  float: left;
+  width: 100%;
+}
+.menu > li {
+  float: left;
+  width: calc(100% / 5);
+  position: relative;
+}
+.menu > li > a {
+  float: left;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  padding: 15px 0;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+.menu > li:hover > a {
+  background-color: rgb(50, 50, 50, 0.1);
+}

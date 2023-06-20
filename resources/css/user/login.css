@@ -1,0 +1,104 @@
+/* Login */
+#login {
+  width: 45%;
+  margin: 0 auto;
+}
+.loginBox {
+  float: left;
+  width: 100%;
+  border: 2px solid #94c3bb;
+  border-radius: 20px;
+  margin: 50px 0;
+}
+.loginBox .title {
+  float: left;
+  width: 100%;
+  text-align: center;
+  font-size: 26px;
+  background-color: #94c3bb;
+  padding: 15px 0;
+  border-radius: 15px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+.loginBoxArea {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+  padding: 30px 45px;
+}
+#loginForm {
+  float: left;
+  width: 100%;
+}
+#loginForm > .form-group {
+  float: left;
+  width: 100%;
+  margin-bottom: 40px;
+  position: relative;
+}
+#loginForm > .form-group > label {
+  float: left;
+  width: 100%;
+  font-size: 15px;
+  padding-bottom: 20px;
+  color: #757575;
+  cursor: text;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: transform 0.2s ease-out, color 0.2s ease-out;
+  transform-origin: 0% 100%;
+}
+#loginForm > .form-group > label.active {
+  transform: translateY(-30px) scale(0.8);
+}
+#loginForm > .form-group > input {
+  float: left;
+  width: 100%;
+  font-size: 15px;
+  border: 0;
+  border-bottom: 1px solid #999;
+  padding-bottom: 10px;
+  transition: border 0.5s, transform 0.5s;
+}
+#loginForm > .form-group > input:focus {
+  border-color: #55c0ae;
+  color: #495057;
+}
+#loginForm > .form-group > input:focus ~ label {
+  color: #94c3bb;
+}
+#loginForm > .loginBtn {
+  float: left;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+}
+#loginForm > .loginBtn button {
+  float: left;
+  width: 100%;
+  background-color: #94c3bb;
+  border: 0;
+  color: #fff;
+  padding: 10px 0;
+  font-size: 20px;
+  cursor: pointer;
+}
+#loginForm > .joinComment {
+  float: left;
+  width: 100%;
+  margin-top: 45px;
+  font-size: 12px;
+  text-align: center;
+  color: #999;
+}
+#loginForm > .joinBtn {
+  float: left;
+  width: 100%;
+  margin-top: 15px;
+  text-align: center;
+}
+#loginForm > .joinBtn a {
+  font-size: 15px;
+}

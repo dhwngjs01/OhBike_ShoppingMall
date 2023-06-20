@@ -1,0 +1,38 @@
+#orderInfo {
+  float: left;
+  width: 100%;
+}
+#orderInfo .title {
+  float: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+#orderInfo .title svg {
+  float: left;
+  font-size: 45px;
+  color: #94c3bb;
+}
+#orderInfo .title h2 {
+  float: left;
+  font-size: 30px;
+  margin-left: 20px;
+}
+#orderInfoList {
+  float: left;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+#orderInfoList > thead > tr {
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #bfbfbf;
+}
+#orderInfoList > thead > tr > th {
+  line-height: 40px;
+  font-size: 16px;
+}
+#orderInfoList > tbody > tr {
+  border-bottom: 1px solid #bfbfbf;
+}

@@ -1,0 +1,127 @@
+/* Product Detail */
+#productDetail {
+  float: left;
+  width: 100%;
+}
+#productDetailTop {
+  float: left;
+  width: 100%;
+}
+#productDetailTop > div {
+  float: left;
+  width: 50%;
+}
+#productDetailTop > .left {
+  padding: 0 40px;
+}
+#productDetailTop > .right {
+  padding-left: 40px;
+}
+#productDetailTop .image {
+  float: left;
+  width: 100%;
+}
+#productDetailTop .image img {
+  float: left;
+  width: 100%;
+}
+#productDetailTop .productInfo {
+  float: left;
+  width: 100%;
+  border-bottom: 1px solid #bfbfbf;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  padding-left: 10px;
+}
+#productDetailTop .productInfo > p {
+  float: left;
+  width: 100%;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 35px;
+}
+
+#productDetailTop .productBuyArea {
+  float: left;
+  width: 100%;
+}
+#productBuyForm {
+  float: left;
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 10px;
+}
+#productBuyForm > ul {
+  float: left;
+  width: 100%;
+  margin-bottom: 30px;
+}
+#productBuyForm > ul > li {
+  float: left;
+  font-size: 18px;
+  line-height: 30px;
+}
+#productBuyForm > ul > li:first-child {
+  width: 20%;
+}
+#productBuyForm > ul > li:last-child {
+  width: 80%;
+}
+#productBuyForm .productPrice .text-red {
+  width: 100%;
+  font-size: 25px;
+  color: #e10701;
+  font-weight: bold;
+}
+#productBuyForm .productOption select {
+  float: left;
+  padding: 5px 30px 5px 10px;
+}
+#productBuyForm .productNum input {
+  float: left;
+  width: 90px;
+  height: 25px;
+  font-size: 16px;
+  text-align: right;
+  padding: 0 5px;
+}
+#productBuyForm .productBuyBtns {
+  border-top: 1px solid #bfbfbf;
+  padding-top: 30px;
+  margin-top: 20px;
+}
+#productBuyForm .productBuyBtns > li {
+  float: left;
+}
+#productBuyForm .productBuyBtns > li:first-child {
+  width: 60%;
+  padding-right: 10px;
+}
+#productBuyForm .productBuyBtns > li:last-child {
+  width: 40%;
+}
+#productBuyForm .productBuyBtns > li > button {
+  float: left;
+  width: 100%;
+  padding: 15px 0;
+  font-size: 17px;
+}
+#productBuyForm .productBuyBtns > li > #productBuy {
+  background-color: #0094aa;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+}
+#productBuyForm .productBuyBtns > li > #addBasket {
+  background-color: #ccc;
+  border: 0;
+  cursor: pointer;
+}
+
+#productDetailContent {
+  float: left;
+  width: 100%;
+  border-top: 1px solid #bfbfbf;
+  margin-top: 30px;
+  padding-top: 30px;
+}

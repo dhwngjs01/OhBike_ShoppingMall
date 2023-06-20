@@ -1,0 +1,158 @@
+/* Basket */
+#basket {
+  float: left;
+  width: 100%;
+}
+#basket .title {
+  float: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+#basket .title svg {
+  float: left;
+  font-size: 45px;
+  color: #94c3bb;
+}
+#basket .title h2 {
+  float: left;
+  font-size: 30px;
+  margin-left: 20px;
+}
+#basketList {
+  float: left;
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+#basketList th {
+  line-height: 40px;
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #bfbfbf;
+  font-size: 16px;
+}
+#basketList tbody tr td {
+  border-bottom: 1px solid #bfbfbf;
+  padding: 15px 0;
+}
+#basketList tbody tr td input[type="checkbox"] {
+  display: none;
+}
+#basketList tbody tr td input[type="checkbox"] + label {
+  display: inline-block;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333;
+}
+
+#basketList tbody tr td input[type="checkbox"] + label .notChecked {
+  display: inline-block;
+}
+#basketList tbody tr td input[type="checkbox"] + label .checked {
+  display: none;
+}
+#basketList tbody tr td input[type="checkbox"]:checked + label .notChecked {
+  display: none;
+}
+#basketList tbody tr td input[type="checkbox"]:checked + label .checked {
+  display: inline-block;
+}
+
+#basketList tbody tr td .btnOrderProduct {
+  background-color: #94c3bb;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#basketList tbody tr td .btnDeleteProduct {
+  background-color: #999;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+#basketBtnList {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+}
+#basketBtnList .left {
+  float: left;
+  padding-left: 19px;
+}
+#basketBtnList .left #allSelect {
+  display: none;
+}
+#basketBtnList .left #allSelect + .allSelectIcon {
+  float: left;
+  font-size: 18px;
+  cursor: pointer;
+  color: #333;
+  line-height: 38px;
+}
+#basketBtnList .left #allSelect + .allSelectIcon .notChecked {
+  display: inline-block;
+}
+#basketBtnList .left #allSelect + .allSelectIcon .checked {
+  display: none;
+}
+#basketBtnList .left #allSelect:checked + .allSelectIcon .notChecked {
+  display: none;
+}
+#basketBtnList .left #allSelect:checked + .allSelectIcon .checked {
+  display: inline-block;
+}
+#basketBtnList .left .allSelectText {
+  float: left;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 38px;
+  margin-left: 10px;
+}
+#basketBtnList .left #btnRemoveSelected {
+  float: left;
+  background-color: #999;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-left: 20px;
+}
+
+#basketBtnList .right {
+  float: right;
+  padding-right: 10px;
+}
+#basketBtnList .right #btnSelectedOrder {
+  float: left;
+  background-color: #999;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+#basketBtnList .right #btnAllOrder {
+  float: left;
+  background-color: #94c3bb;
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  color: #fff;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.free-shipping {
+  color: #dc3545;
+  font-weight: bold;
+  font-size: 12px;
+  margin-top: 0.3rem;
+}

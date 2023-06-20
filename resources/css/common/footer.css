@@ -1,0 +1,82 @@
+/* Footer */
+#footer {
+  float: left;
+  width: 100%;
+}
+.footerBg {
+  float: left;
+  width: 100%;
+  background-color: #bfdbd6;
+  padding: 50px 0;
+}
+.footerTop {
+  float: left;
+  width: 100%;
+  border-bottom: 1px solid #555;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+}
+.footerLogo {
+  float: left;
+  width: 25%;
+}
+.footerLogo img {
+  float: left;
+  width: 100%;
+}
+
+.footerMenu {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+}
+.footerMenu > li {
+  float: left;
+  border-right: 1px solid #555;
+  padding-right: 10px;
+  margin-right: 10px;
+}
+.footerMenu > li:last-child {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.footerMenu > li > a {
+  float: left;
+  font-size: 13px;
+}
+
+.footerBottom {
+  float: left;
+  width: 100%;
+}
+.footerBottom .address {
+  float: left;
+  width: 100%;
+}
+.footerBottom .address > li {
+  float: left;
+  width: 100%;
+  line-height: 30px;
+}
+.footerBottom .address > li > span {
+  padding-right: 20px;
+  font-size: 13px;
+}
+.footerBottom .address > li > span:last-child {
+  padding: 0;
+}
+
+#copyright {
+  float: left;
+  width: 100%;
+  background-color: #090909;
+}
+#copyright p {
+  float: left;
+  width: 100%;
+  text-align: center;
+  color: #999;
+  line-height: 50px;
+  font-size: 13px;
+}

@@ -1,0 +1,274 @@
+#productPayment {
+  float: left;
+  width: 100%;
+}
+#productPayment .title {
+  float: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+#productPayment .title svg {
+  float: left;
+  font-size: 45px;
+  color: #94c3bb;
+}
+#productPayment .title h2 {
+  float: left;
+  font-size: 30px;
+  margin-left: 20px;
+}
+#productPaymentList {
+  float: left;
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+}
+#productPaymentList th {
+  line-height: 40px;
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #bfbfbf;
+  font-size: 16px;
+}
+#productPaymentList tbody tr td {
+  border-bottom: 1px solid #bfbfbf;
+  padding: 5px 0;
+  vertical-align: middle;
+}
+#productPaymentList tbody tr td input {
+  width: 35px;
+  height: 25px;
+  font-size: 16px;
+  text-align: right;
+  padding: 0 5px;
+  display: inline-block;
+}
+#productPaymentList tbody tr td span {
+  display: inline-block;
+  padding-left: 5px;
+}
+
+#productPaymentForm {
+  float: left;
+  width: 100%;
+}
+#productPaymentDelivery {
+  float: left;
+  width: 100%;
+  margin-top: 50px;
+}
+#productPaymentDelivery > div {
+  float: left;
+  width: 50%;
+}
+
+#productPaymentDelivery > #orderInfo {
+  padding-right: 15px;
+}
+#productPaymentDelivery > #orderInfo > h3 {
+  float: left;
+  width: 100%;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+#productPaymentDelivery > #orderInfo > table {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  border-collapse: collapse;
+}
+#productPaymentDelivery > #orderInfo > table > tbody > tr {
+  border-bottom: 1px solid #bfbfbf;
+}
+#productPaymentDelivery > #orderInfo > table > tbody > tr > td {
+  padding: 20px 15px;
+}
+#productPaymentDelivery > #orderInfo > table > tbody > tr > td:first-child {
+  border-right: 1px solid #bfbfbf;
+}
+#productPaymentDelivery > #orderInfo > table > tbody > tr > td {
+  padding: 20px 15px;
+}
+#productPaymentDelivery > #orderInfo > table > tbody > tr > .orderAddress > p {
+  float: left;
+  width: 100%;
+}
+#productPaymentDelivery
+  > #orderInfo
+  > table
+  > tbody
+  > tr
+  > .orderAddress
+  > p:last-child {
+  margin-top: 10px;
+}
+
+#productPaymentDelivery > #deliveryInfo {
+  padding-left: 15px;
+}
+#productPaymentDelivery > #deliveryInfo > h3 {
+  float: left;
+  width: 100%;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+#productPaymentDelivery > #deliveryInfo > table {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  border-collapse: collapse;
+}
+#productPaymentDelivery > #deliveryInfo > table > tbody > tr {
+  border-bottom: 1px solid #bfbfbf;
+}
+#productPaymentDelivery > #deliveryInfo > table > tbody > tr > td {
+  padding: 15px 15px;
+}
+#productPaymentDelivery > #deliveryInfo > table > tbody > tr > td:first-child {
+  border-right: 1px solid #bfbfbf;
+}
+
+#productPaymentDelivery > #deliveryInfo #order_ship_name {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  line-height: 30px;
+  padding: 0 10px;
+}
+#productPaymentDelivery > #deliveryInfo #order_ship_phone {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  line-height: 30px;
+  padding: 0 10px;
+}
+
+#productPaymentDelivery > #deliveryInfo #address {
+  float: left;
+  width: 100%;
+}
+#productPaymentDelivery > #deliveryInfo #address .zipCode {
+  float: left;
+  width: 30%;
+  margin-bottom: 15px;
+}
+#productPaymentDelivery > #deliveryInfo #address .zipCode input {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  line-height: 30px;
+  padding: 0 10px;
+}
+#productPaymentDelivery > #deliveryInfo #address .address {
+  float: left;
+  width: 100%;
+}
+#productPaymentDelivery > #deliveryInfo #address .address > li {
+  float: left;
+  width: 100%;
+}
+#productPaymentDelivery > #deliveryInfo #address .address > li:first-child {
+  margin-bottom: 10px;
+}
+#productPaymentDelivery > #deliveryInfo #address .address > li input {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  line-height: 30px;
+  padding: 0 10px;
+}
+#productPaymentDelivery > #deliveryInfo #address .btnFindAddress {
+  float: left;
+  margin-left: 10px;
+}
+#productPaymentDelivery > #deliveryInfo #address .btnFindAddress button {
+  float: left;
+  background-color: #94c3bb;
+  border: 1px solid #fff;
+  padding: 7px 16px;
+  color: #fff;
+  cursor: pointer;
+}
+
+#productPaymentDelivery > #deliveryInfo #order_msg {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  resize: none;
+  padding: 10px;
+  line-height: 20px;
+  font-size: 13px;
+}
+
+#productPaymentPriceResult {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  margin-top: 50px;
+}
+#productPaymentPriceResult ul {
+  float: left;
+  width: 100%;
+  padding: 40px 50px;
+  display: flex;
+  align-items: center;
+}
+#productPaymentPriceResult ul li {
+  float: left;
+  width: 20%;
+  text-align: center;
+}
+#productPaymentPriceResult ul li h3 {
+  float: left;
+  width: 100%;
+  font-size: 18px;
+}
+#productPaymentPriceResult ul li p {
+  float: left;
+  width: 100%;
+  font-size: 18px;
+  margin-top: 10px;
+}
+#productPaymentPriceResult ul li svg {
+  font-size: 20px;
+}
+#productPaymentPriceResult ul li p.text-red {
+  color: #e10701;
+  font-weight: bold;
+}
+
+#productPaymentBtnList {
+  float: left;
+  width: 100%;
+  margin-top: 50px;
+  display: flex;
+  justify-content: center;
+}
+#productPaymentBtnList button:first-child {
+  float: left;
+  padding: 15px 30px;
+  background-color: #94c3bb;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+#productPaymentBtnList button:last-child {
+  float: left;
+  padding: 15px 30px;
+  background-color: #ccc;
+  border: 1px solid #fff;
+  border-radius: 5px;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+}
+.free-shipping {
+  color: #dc3545;
+  font-weight: bold;
+  font-size: 12px;
+  margin-top: 0.3rem;
+}

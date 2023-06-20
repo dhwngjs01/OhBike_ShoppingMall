@@ -2,6 +2,7 @@ doctype html
 html(lang="ko")
 	head
 		include ../head.pug
+		link(rel="stylesheet" href="/css/public/productPayment.css")
 	body
 		#wrap
 			include ../header.pug
@@ -13,14 +14,6 @@ html(lang="ko")
 							h2 결제
 
 						table#productPaymentList
-							colgroup
-								col(style="width:15%")
-								col(style="width:25%")
-								col(style="width:7%")
-								col(style="width:10%")
-								col(style="width:10%")
-								col(style="width:10%")
-								col(style="width:13%")
 							thead
 								tr
 									th(colspan="2") 상품
@@ -34,18 +27,18 @@ html(lang="ko")
 									each product, i in product_list
 										tr
 											td
-												img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}` style="width:70%;")
+												img(src=`../uploadFiles/${product.file_save_name}`, alt=`${product.file_show_name}` style="height:80px;")
 											td.text-left #{product.product_name}
 											td #{product.option_name}
 											td
-												//- input#optionNum(type="text" value=`${payment.selected_option_num}` min="1" max=`${payment.option_max}`)
 												| #{product.selected_option_num} 개
 											td #{product.product_price.numberWithCommas()} 원
 											td
 												- if(product.product_price * product.selected_option_num > 50000){
-													| 0 원
+													p.text-decoration-line-through #{(2500 * product.selected_option_num).numberWithCommas()} 원
+													p.free-shipping 무료배송
 												- } else {
-													| {(2500 * product.selected_option_num).numberWithCommas()} 원
+													| #{(2500 * product.selected_option_num).numberWithCommas()} 원
 												- }
 											td
 												- if(product.product_price * product.selected_option_num > 50000){
@@ -208,23 +201,11 @@ html(lang="ko")
 					success : (res) => {
 						console.log(res);
 
-						if(res.ordersInsertFailed || res.detailInsertFailed){
-							alert("결제 실패했습니다.");
-							return false;
-						}
-
-						if(res.optionsUpdateFailed){
-							alert("상품 수량 감소를 실패했습니다.");
-							return false;
+						if(res.message){
+							alert(res.message);
 						}
 						
-						if(res.basketDeleteFailed){
-							alert("장바구니에 담긴 상품이 삭제되지 않았습니다.");
-							return false;
-						}
-						
-						if(res.orderSuccess){
-							alert("결제 완료되었습니다.");
+						if(res.success){
 							link("/user/orderInfo");
 						}
 					},

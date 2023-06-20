@@ -1,0 +1,49 @@
+#myPage .left {
+  float: left;
+  width: 25%;
+  padding-right: 30px;
+}
+#myPage .left .title {
+  float: left;
+  width: 100%;
+  font-size: 24px;
+  text-align: center;
+}
+#myPage .left .user_name {
+  float: left;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #bfbfbf;
+  border-top: 3px solid #94c3bb;
+  padding: 20px 0;
+  margin-top: 15px;
+}
+#myPage .left .sideMenu {
+  float: left;
+  width: 100%;
+  border: 1px solid #bfbfbf;
+  border-top: 0;
+  padding: 15px;
+}
+#myPage .left .sideMenu .sideMenuItem {
+  float: left;
+  width: 100%;
+  padding-top: 10px;
+}
+#myPage .left .sideMenu .sideMenuItem > p {
+  float: left;
+  width: 100%;
+  font-size: 16px;
+}
+#myPage .left .sideMenu .sideMenuItem > ul {
+  float: left;
+  width: 100%;
+  padding-top: 20px;
+  padding-left: 10px;
+}
+#myPage .left .sideMenu .sideMenuItem > ul > li {
+  float: left;
+  width: 100%;
+  padding-bottom: 15px;
+}
