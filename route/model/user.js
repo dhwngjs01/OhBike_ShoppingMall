@@ -246,49 +246,42 @@ exports.basket = async (req, res) => {
 };
 
 // 장바구니 상품 삭제 - /user/basket
-exports.basketDeletePost = (req, res) => {
-  user_no = req.session.user_no; // 로그인 여부 확인
-  basket_no_list = JSON.parse(req.body.basket_no_list); // 배열로 받은 상품(장바구니 번호)
+exports.basketDeletePost = async (req, res) => {
+  const conn = await db().getConnection();
 
-  // 로그인 상태일 경우
-  if (user_no) {
-    sql = "";
+  const user_no = req.session.user_no; // 로그인 여부 확인
+  const basket_no_list = JSON.parse(req.body.basket_no_list); // 배열로 받은 상품(장바구니 번호)
 
-    // 장바구니 상품 삭제 쿼리문 생성 및 실행
-    // 배열로 받은 상품(장바구니 번호)만큼 반복
-    basket_no_list.forEach((basket_no) => {
-      // 쿼리문 생성
-      delete_basket_sql =
-        "delete from basket where basket_no = ? and user_no = ?;";
-
-      // 쿼리문에 값 삽입
-      delete_basket_sql_format = db.format(delete_basket_sql, [
-        basket_no,
-        user_no,
-      ]);
-
-      // 쿼리문 조합
-      sql += delete_basket_sql_format;
-    });
-
-    // 쿼리문 실행
-    db.query(sql, (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        // 영향이 있는 행이 없다면 오류 전송
-        if (result.affectedRows < 1) {
-          res.send({ sqlError: result });
-        } else {
-          // 장바구니 상품 삭제 성공
-          res.send("장바구니에 담긴 상품이 삭제되었습니다.");
-        }
-      }
-    });
-  } else {
-    // 로그인 상태가 아닐 경우
-    res.send("please_login");
+  // 로그인 상태가 아닐 경우
+  if (user_no === undefined) {
+    res.send({ message: "로그인 후 이용할 수 있는 서비스입니다." });
+    return;
   }
+
+  var sql = "";
+
+  // 배열로 받은 상품(장바구니 번호)만큼 반복
+  basket_no_list.forEach((basket_no) => {
+    // 쿼리문 생성
+    sql += `DELETE FROM basket 
+          WHERE basket_no = ${basket_no}
+          AND user_no = ${user_no};`;
+  });
+
+  // 장바구니 삭제 쿼리문 실행
+  const [delete_basket_result] = await conn.query(sql);
+
+  if (delete_basket_result.affectedRows < 1) {
+    res.send({ message: "장바구니에 담긴 상품이 삭제되지 않았습니다." });
+    return;
+  }
+
+  res.send({
+    success: true,
+    message: "장바구니에 담긴 상품이 삭제되었습니다.",
+  });
+
+  conn.release();
 };
 
 // 주문 조회 페이지 - /user/orderInfo
@@ -298,13 +291,18 @@ exports.orderInfo = async (req, res) => {
   const user_no = req.session.user_no;
 
   if (user_no) {
-    // 주문 내역 개수
-    var sql = `SELECT order_no FROM orders WHERE user_no = ?;`;
+    // 주문 내역
+    var sql = `SELECT orders.order_no, count(*) as order_list_count 
+              FROM orders, detail 
+              WHERE orders.order_no = detail.order_no 
+              AND user_no = ? 
+              GROUP BY orders.order_no;`;
+
     var [rows] = await conn.query(sql, user_no);
     const order_list = rows;
 
-    // 주문 내역 리스트
-    var sql = `SELECT file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
+    // 주문 상세
+    var sql = `SELECT orders.order_no, file_save_name, product_name, option_name, detail.product_price, detail.option_num, order_totalPrice, order_status, order_date, order_status
       FROM orders, detail, options, product, image 
       WHERE orders.order_no = detail.order_no 
       AND detail.option_no = options.option_no 
@@ -315,7 +313,18 @@ exports.orderInfo = async (req, res) => {
     var [rows] = await conn.query(sql, user_no);
     const detail_list = rows;
 
-    res.render("orderInfo", { order_list, detail_list });
+    // 주문내역에 주문 상세 입력
+    order_list.forEach((order) => {
+      order.detail_list = [];
+
+      detail_list.forEach((detail) => {
+        if (order.order_no == detail.order_no) {
+          order.detail_list.push(detail);
+        }
+      });
+    });
+
+    res.render("orderInfo", { order_list });
   } else {
     res.send(
       '<script>alert("로그인 후 이용할 수 있는 서비스입니다."); location.href = "/user/login"</script>'

@@ -42,7 +42,7 @@ html(lang="ko")
                                     .card-body-icon
                                         i.fas.fa-fw.fa-life-ring
                                     .mr-5 #{product_lack_count} 개 품목의 재고가 부족합니다!
-                                a.card-footer.text-white.clearfix.small.z-1(href='/admin/order')
+                                a.card-footer.text-white.clearfix.small.z-1(href='/admin/product')
                                     span.float-left 자세히 보기
                                     span.float-right
                                         i.fas.fa-angle-right
@@ -51,7 +51,7 @@ html(lang="ko")
                     .card.mb-3
                         .card-header
                             i.fas.fa-fw.fa-shipping-fast
-                            |  주문정보
+                            span.ml-2 주문정보
                         .card-body
                             .table-responsive
                                 table.table.table-sm.table-bordered(width='100%', cellspacing='0')
@@ -76,7 +76,7 @@ html(lang="ko")
                                                 td.text-right #{(order.option_num * order.product_price).numberWithCommas()}
                                                 td #{order.user_name}
                                                 td #{order.order_status}
-                                                td #{order.order_date.format("yyyy-MM-dd HH:mm")}
+                                                td #{order.order_date.format("yyyy-MM-dd HH:mm:ss")}
                                     tfoot
                                         tr
                                             th 이미지
@@ -94,21 +94,11 @@ html(lang="ko")
                     .card.mb-3
                         .card-header
                             i.fas.fa-fw.fa-users
-                            |  회원정보
+                            span.ml-2 회원정보
                         .card-body
                             .table-responsive
-                                table.table.table-sm.table-bordered(width='100%', cellspacing='0')
+                                table.table.table-sm.table-bordered(cellspacing='0')
                                     thead
-                                        tr
-                                            th 회원 번호
-                                            th 아이디
-                                            th 이름
-                                            th 휴대폰 번호
-                                            th 우편번호
-                                            th 주소
-                                            th 상세주소
-                                            th 가입 날짜
-                                    tfoot
                                         tr
                                             th 회원 번호
                                             th 아이디
@@ -128,7 +118,17 @@ html(lang="ko")
                                                 td.text-right #{user.user_zipcode}
                                                 td #{user.user_address}
                                                 td #{user.user_detail_address}
-                                                td #{user.user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
+                                                td #{user.user_date.format("yyyy-MM-dd HH:mm:ss")}
+                                    tfoot
+                                        tr
+                                            th 회원 번호
+                                            th 아이디
+                                            th 이름
+                                            th 휴대폰 번호
+                                            th 우편번호
+                                            th 주소
+                                            th 상세주소
+                                            th 가입 날짜
                                         
                         .card-footer.small.text-muted 마지막으로 회원이 가입한 날짜 : #{last_user_date.format("yyyy년 MM월 dd일 HH시 mm분")}
 

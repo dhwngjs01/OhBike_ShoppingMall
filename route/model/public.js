@@ -92,8 +92,9 @@ exports.searchProduct = async (req, res) => {
   // 상품 개수 구하기 쿼리문 생성 및 실행
   var sql = `SELECT count(product_no) AS product_count 
             FROM product 
-            WHERE product_name LIKE ? 
-            OR product_brand LIKE ?;`;
+            WHERE (product_name LIKE ? 
+            OR product_brand LIKE ?) 
+            AND product_enable = 1;`;
   var [rows] = await conn.query(sql, [`%${keyword}%`, `%${keyword}%`]);
   const product_count = rows[0].product_count;
 
@@ -101,8 +102,9 @@ exports.searchProduct = async (req, res) => {
   var sql = `SELECT * 
             FROM product 
             NATURAL JOIN image 
-            WHERE product_name LIKE ?
-            OR product_brand LIKE ?;`;
+            WHERE (product_name LIKE ? 
+            OR product_brand LIKE ?) 
+            AND product_enable = 1;`;
   var [rows] = await conn.query(sql, [`%${keyword}%`, `%${keyword}%`]);
   const product_list = rows;
 
@@ -138,7 +140,7 @@ exports.productDetail = async (req, res) => {
   conn.release();
 };
 
-// 상품 결제 페이지
+// 결제 페이지
 exports.payment = async (req, res) => {
   const conn = await db().getConnection();
 
@@ -282,73 +284,77 @@ exports.paymentFinal = async (req, res) => {
   // 주문 테이블에 주문 정보 저장
   // 주문 번호를 생성하기 위해 주문 테이블에 데이터를 저장한 후 주문 번호를 가져옴
   // 주문 번호를 가져온 후 주문 상세 테이블에 주문 번호와 상품 번호, 옵션 번호, 옵션 개수를 저장
-  var sql = `INSERT INTO orders SET ? returning order_no;`;
+  var sql = `INSERT INTO orders SET ?`;
   var [insert_order_result] = await conn.query(sql, order_data);
 
-  // 주문 테이블에 주문 정보 저장 성공
-  if (insert_order_result[0].order_no) {
-    const payment_size = req.body.payment_size; // 결제 상품 개수
+  const order_no = insert_order_result.insertId; // 주문 번호
 
-    // 주문 상세 테이블에 저장할 데이터
-    detail_data = {
-      product_no: req.body.product_no, // 상품 번호
-      order_no: insert_order_result[0].order_no, // 주문 번호
-      option_no: req.body.option_no, // 옵션 번호
-      option_num: req.body.option_num, // 옵션 개수
-      product_price: req.body.product_price, // 상품 가격
-    };
-
-    // 주문 상세 테이블에 주문 상세 정보 저장 (주문 번호, 상품 번호, 옵션 번호, 옵션 개수, 상품 가격)
-    var sql = "";
-    for (i = 0; i < payment_size; i++) {
-      sql += `INSERT INTO detail(product_no, order_no, option_no, option_num, product_price) 
-              VALUES (${detail_data.product_no[i]}, ${detail_data.order_no}, ${detail_data.option_no[i]}, ${detail_data.option_num[i]}, ${detail_data.product_price[i]});`;
-    }
-    // 쿼리문 실행
-    var [result] = await conn.query(sql);
-
-    // 주문 상세 테이블에 주문 상세 정보 저장 성공
-    if (result.affectedRows > 0) {
-      // 상품 수량 감소 쿼리문 생성
-      var sql = "";
-      for (i = 0; i < payment_size; i++) {
-        sql += `UPDATE options SET option_num = option_num - ${detail_data.option_num[i]} WHERE option_no = ${detail_data.option_no[i]};`;
-      }
-      // 쿼리문 실행
-      var [result] = await conn.query(sql);
-
-      // 상품 수량 감소 성공
-      if (result.affectedRows > 0) {
-        // 장바구니에서 넘어온 상품일 시
-        if (basket_no_list.length > 0) {
-          var sql = "";
-          basket_no_list.forEach((basket_no) => {
-            sql += `DELETE FROM basket WHERE basket_no = ${basket_no};`;
-          });
-
-          // 장바구니에서 넘어온 상품 삭제 쿼리문 실행
-          var [result] = await conn.query(sql);
-
-          // 장바구니에서 넘어온 상품 삭제 성공
-          if (result.affectedRows > 0) {
-            res.send({ orderSuccess: true });
-          } else {
-            // 장바구니에서 넘어온 상품 삭제 실패
-            res.send({ basketDeleteFailed: true });
-          }
-        } else {
-          res.send({ orderSuccess: true });
-        }
-      } else {
-        // 상품 수량 감소 실패
-        res.send({ optionUpdateFailed: true });
-      }
-    } else {
-      res.send({ detailInsertFailed: true });
-    }
-  } else {
-    res.send({ ordersInsertFailed: true });
+  // 주문 테이블에 주문 정보 저장 실패
+  if (order_no < 1) {
+    res.send({ message: "주문 정보를 등록하지 못했습니다." });
+    return;
   }
+
+  const payment_size = req.body.payment_size; // 결제 상품 개수
+
+  // 주문 상세 테이블에 저장할 데이터
+  detail_data = {
+    product_no: req.body.product_no, // 상품 번호
+    order_no: order_no, // 주문 번호
+    option_no: req.body.option_no, // 옵션 번호
+    option_num: req.body.option_num, // 옵션 개수
+    product_price: req.body.product_price, // 상품 가격
+  };
+
+  // 주문 상세 테이블에 주문 상세 정보 저장 (주문 번호, 상품 번호, 옵션 번호, 옵션 개수, 상품 가격)
+  var sql = "";
+  for (i = 0; i < payment_size; i++) {
+    sql += `INSERT INTO detail(product_no, order_no, option_no, option_num, product_price) 
+              VALUES (${detail_data.product_no[i]}, ${detail_data.order_no}, ${detail_data.option_no[i]}, ${detail_data.option_num[i]}, ${detail_data.product_price[i]});`;
+  }
+  // 쿼리문 실행
+  var [insert_detail_result] = await conn.query(sql);
+
+  // 주문 상세 테이블에 주문 상세 정보 저장 실패
+  if (insert_detail_result.affectedRows < 1) {
+    res.send({ message: "주문 상세 정보를 등록하지 못했습니다." });
+    return;
+  }
+
+  // 상품 수량 감소 쿼리문 생성
+  var sql = "";
+  for (i = 0; i < payment_size; i++) {
+    sql += `UPDATE options 
+          SET option_num = option_num - ${detail_data.option_num[i]} 
+          WHERE option_no = ${detail_data.option_no[i]};`;
+  }
+  // 쿼리문 실행
+  var [update_options_result] = await conn.query(sql);
+
+  // 상품 수량 감소 실패
+  if (update_options_result.affectedRows < 1) {
+    res.send({ message: "상품 수량이 감소되지 않았습니다." });
+    return;
+  }
+
+  // 장바구니에서 넘어온 상품일 시
+  if (basket_no_list.length > 0) {
+    var sql = "";
+    basket_no_list.forEach((basket_no) => {
+      sql += `DELETE FROM basket WHERE basket_no = ${basket_no};`;
+    });
+
+    // 장바구니에서 넘어온 상품 삭제 쿼리문 실행
+    var [delete_basket_result] = await conn.query(sql);
+
+    // 장바구니에서 넘어온 상품 삭제 실패
+    if (delete_basket_result.affectedRows < 1) {
+      res.send({ message: "장바구니에 담긴 상품을 삭제하지 못했습니다." });
+      return;
+    }
+  }
+
+  res.send({ success: true, message: "상품이 주문되었습니다." });
 
   conn.release();
 };
