@@ -15,7 +15,7 @@ Express.js 기반의 바이크 용품 쇼핑몰입니다.
 - **JavaScript Runtime** : `Node.js 19.8.1`
 - **Template Engine** : `Pug 3.0.2`
 - **Server** : `Express.js 4.17.1`
-- **IDE** : `Visual Studio Code 1.79.2`
+- **Text Editor** : `Visual Studio Code 1.79.2`
 - **Database** : `MariaDB 10.11`
 
 ## 📋 시스템 구성도
