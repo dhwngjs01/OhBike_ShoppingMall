@@ -4,7 +4,7 @@ Express.js 기반의 바이크 용품 쇼핑몰입니다.
 
 ## 📖 프로젝트 소개
 
-<a href="https://bike-auction.co.kr/main/index.php" title="바이크옥션으로 이동하기">바이크옥션</a>, <a href="https://www.fc-moto.de/" title="FC MOTO로 이동하기">FC MOTO</a>를 참고하여 만든 바이크 용품 쇼핑몰 입니다.
+<a href="https://bike-auction.co.kr/main/index.php" title="바이크옥션으로 이동하기" target="_blank">바이크옥션</a>, <a href="https://www.fc-moto.de/" title="FC MOTO로 이동하기" target="_blank">FC MOTO</a>를 참고하여 만든 바이크 용품 쇼핑몰 입니다.
 
 ## ⏰ 개발 기간
 
