@@ -296,7 +296,8 @@ exports.orderInfo = async (req, res) => {
               FROM orders, detail 
               WHERE orders.order_no = detail.order_no 
               AND user_no = ? 
-              GROUP BY orders.order_no;`;
+              GROUP BY orders.order_no
+              ORDER BY orders.order_no DESC;`;
 
     var [rows] = await conn.query(sql, user_no);
     const order_list = rows;
