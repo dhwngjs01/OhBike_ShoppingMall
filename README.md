@@ -22,12 +22,12 @@ Express.js 기반의 바이크 용품 쇼핑몰
 
 |                                                             사용자 구성도                                                             |                                                             관리자 구성도                                                             |
 | :-----------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------: |
-| <img alt='사용자 구성도' src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/a9b14438-5fb6-453e-89a2-d13ee644374f"> | <img alt='관리자 구성도' src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/654c81ad-9662-456b-8f37-34348d275bde"> |
+| <img alt='사용자 구성도' src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/e0baf436-df4b-4a94-b672-714f994ca4fb"> | <img alt='관리자 구성도' src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/cde911a5-0ec7-4985-a733-5d5cb68c99be"> |
 
 ## ⌨ E-R 다이어그램
 
 <p align="center">
-  <img alt="E-R 다이어그램" src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/e79db85d-492f-4222-9794-31f03424ddbe" width="80%">
+  <img alt="E-R 다이어그램" src="https://github.com/dhwngjs01/OhBike_ShoppingMall/assets/38345593/836b290a-9cd1-4b70-8c9e-998713cd121d" width="80%">
 </p>
 
 ## 🔍 기능 설명
